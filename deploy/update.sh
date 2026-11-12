@@ -6,6 +6,8 @@ git -C .. pull --ff-only
 docker compose build
 docker compose up -d --remove-orphans
 docker image prune -f
+git -C .. rev-parse HEAD > .deployed
+echo "Deployed $(git -C .. rev-parse --short HEAD)"
 
 if [ ! -f /etc/cron.d/petavilo-places ]; then
     echo "30 4 2 * * root cd $(pwd) && docker compose run --rm places --force >> /var/log/petavilo-places.log 2>&1" > /etc/cron.d/petavilo-places

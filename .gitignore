@@ -32,3 +32,4 @@ package-lock.json
 /storage/media-library
 deploy/.env
 deploy/backups/
+deploy/.deployed
