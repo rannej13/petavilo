@@ -18,6 +18,7 @@ class DedupeBusinessesCommand extends Command
     public function handle(): int
     {
         $this->backfillKeys();
+        $this->hideNonCatVets();
 
         $removed = 0;
 
@@ -52,6 +53,30 @@ class DedupeBusinessesCommand extends Command
                     }
                 }
             });
+    }
+
+    private function hideNonCatVets(): void
+    {
+        if ($this->option('dry-run')) {
+            return;
+        }
+
+        $hidden = Business::query()
+            ->whereNull('owner_user_id')
+            ->whereNotNull('source')
+            ->whereRaw("name ~* '\\m(equine|equestrian|horse|farm|livestock|large animal|cattle|poultry|bovine)\\M'")
+            ->update(['is_published' => false]);
+
+        if ($hidden > 0) {
+            $this->info("Hid {$hidden} horse and farm businesses.");
+        }
+
+        Business::query()
+            ->whereNotNull('source')
+            ->where('country', 'GB')
+            ->whereRaw('town = UPPER(town)')
+            ->whereRaw("town ~ '[A-Z]'")
+            ->update(['town' => DB::raw('INITCAP(town)')]);
     }
 
     private function resolve(string $key): int

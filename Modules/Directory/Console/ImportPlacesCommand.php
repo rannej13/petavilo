@@ -64,8 +64,15 @@ class ImportPlacesCommand extends Command
                 continue;
             }
 
+            if (preg_match('/\b(equine|equestrian|horse|farm|livestock|large animal|cattle|poultry|bovine)\b/i', (string) $record['name']) === 1) {
+                $skipped++;
+
+                continue;
+            }
+
             $country = strtoupper((string) $record['country']) === 'US' ? 'US' : 'GB';
             $town = trim((string) $record['town']);
+            $town = $country === 'GB' && ($town === mb_strtoupper($town) || $town === mb_strtolower($town)) ? Str::title(mb_strtolower($town)) : $town;
 
             if ($country === 'US' && $town !== '' && filled($record['region'])) {
                 $town .= ', '.strtoupper(Str::afterLast((string) $record['region'], '-'));
