@@ -339,3 +339,71 @@
 .forum-post.is-hidden {
     opacity: 0.6;
 }
+
+.business-head {
+    display: flex;
+    gap: var(--space-4, 1rem);
+    align-items: flex-start;
+}
+
+.business-logo {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+    border-radius: var(--radius-md, 12px);
+    border: 1px solid var(--color-border, #e5e5e5);
+    background: #fff;
+    flex: none;
+}
+
+.business-photos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--space-3, 0.75rem);
+}
+
+.business-photos img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--radius-md, 12px);
+    display: block;
+}
+
+.business-photos--show {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+.business-photos__item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1, 0.25rem);
+}
+
+.benefit-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-5, 1.25rem);
+}
+
+.check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2, 0.5rem);
+}
+
+.check-list li {
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.check-list li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: rgb(178 66 0);
+    font-weight: 700;
+}

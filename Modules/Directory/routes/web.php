@@ -5,9 +5,15 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Route;
 use Modules\Directory\Http\Controllers\BusinessPanelController;
 use Modules\Directory\Http\Controllers\DirectoryController;
+use Modules\Directory\Http\Controllers\OutreachController;
 
 Route::middleware('web')->group(function (): void {
     Route::get('/directory', [DirectoryController::class, 'index'])->name('directory.index');
+    Route::get('/directory/claim/{token}', [OutreachController::class, 'claimForm'])->name('directory.claim.token');
+    Route::post('/directory/claim/{token}', [OutreachController::class, 'claim'])->middleware(['auth', 'throttle:10,60'])->name('directory.claim.token.store');
+    Route::get('/directory/unsubscribe/{token}', [OutreachController::class, 'unsubscribeForm'])->name('directory.unsubscribe');
+    Route::post('/directory/unsubscribe/{token}', [OutreachController::class, 'unsubscribe'])->middleware('throttle:20,1')->name('directory.unsubscribe.store');
+    Route::get('/directory/out/{business}/{kind}', [OutreachController::class, 'out'])->whereIn('kind', ['website', 'booking'])->middleware('throttle:60,1')->name('directory.out');
 
     Route::middleware('auth')->group(function (): void {
         Route::get('/directory/add', [DirectoryController::class, 'create'])->name('directory.create');

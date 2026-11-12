@@ -7,7 +7,9 @@ namespace Modules\Directory\Providers;
 use App\Support\SitemapRegistry;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
+use Modules\Directory\Console\DedupeBusinessesCommand;
 use Modules\Directory\Console\ImportPlacesCommand;
+use Modules\Directory\Console\SendClaimInvitesCommand;
 use Modules\Directory\Models\Business;
 
 class DirectoryServiceProvider extends ServiceProvider
@@ -18,6 +20,8 @@ class DirectoryServiceProvider extends ServiceProvider
 
         $this->callAfterResolving(Schedule::class, static function (Schedule $schedule): void {
             $schedule->command('directory:import-places')->name('directory:import-places')->hourly()->withoutOverlapping();
+            $schedule->command('directory:invite')->name('directory:invite')->weekdays()->at('10:07')->withoutOverlapping()
+                ->when(static fn (): bool => (bool) config('directory.outreach.enabled', false));
         });
     }
 
@@ -29,7 +33,7 @@ class DirectoryServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom(module_path('Directory', 'lang'), 'directory');
 
         if ($this->app->runningInConsole()) {
-            $this->commands([ImportPlacesCommand::class]);
+            $this->commands([ImportPlacesCommand::class, DedupeBusinessesCommand::class, SendClaimInvitesCommand::class]);
         }
 
         SitemapRegistry::register(static fn (): array => [

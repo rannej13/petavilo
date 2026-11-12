@@ -1,5 +1,7 @@
 import csv
 import os
+import re
+import unicodedata
 import shutil
 import sys
 import time
@@ -50,6 +52,22 @@ REGIONS = {
 }
 
 
+STOP_WORDS = re.compile(r"\b(the|ltd|limited|llc|inc|plc|llp|co|company|and)\b")
+
+
+def norm_name(name):
+    text = unicodedata.normalize("NFKD", name or "").encode("ascii", "ignore").decode().lower().replace("&", " ")
+    return re.sub(r"[^a-z0-9]+", "", STOP_WORDS.sub(" ", text))
+
+
+def dedupe_key(country, name, postcode, town):
+    clean = norm_name(name)
+    place = re.sub(r"[^A-Z0-9]", "", (postcode or "").upper()) or re.sub(r"[^a-z0-9]+", "", (town or "").lower())
+    if not clean or not place:
+        return None
+    return f"{country}:{clean}:{place}"
+
+
 def fresh_enough():
     if not os.path.exists(OUT_FILE):
         return False
@@ -82,7 +100,7 @@ def main():
 
     with open(tmp, "w", newline="") as handle:
         writer = csv.writer(handle)
-        writer.writerow(["source_id", "name", "type", "country", "town", "region", "postcode", "address", "phone", "website", "source"])
+        writer.writerow(["source_id", "name", "type", "country", "town", "region", "postcode", "address", "phone", "website", "source", "email", "social", "latitude", "longitude"])
         for country, (xmin, ymin, xmax, ymax) in REGIONS.items():
             query = f"""
                 SELECT id,
@@ -96,7 +114,12 @@ def main():
                        addresses[1].freeform AS address,
                        phones[1] AS phone,
                        websites[1] AS website,
-                       sources[1].dataset AS source
+                       sources[1].dataset AS source,
+                       emails[1] AS email,
+                       socials[1] AS social,
+                       bbox.ymin AS latitude,
+                       bbox.xmin AS longitude,
+                       confidence
                 FROM read_parquet('s3://overturemaps-us-west-2/release/{release}/theme=places/type=place/*', hive_partitioning=1)
                 WHERE bbox.xmin BETWEEN {xmin} AND {xmax}
                   AND bbox.ymin BETWEEN {ymin} AND {ymax}
@@ -107,11 +130,29 @@ def main():
                   AND names.primary IS NOT NULL
             """
             before = rows_written
+            best = {}
+            phones = {}
             for row in con.execute(query).fetchall():
                 kind = directory_type(row[2], row[3])
                 if not kind:
                     continue
-                writer.writerow([row[0], row[1], kind, row[4], row[5] or "", row[6] or "", row[7] or "", row[8] or "", row[9] or "", row[10] or "", row[11] or ""])
+                out = [row[0], row[1], kind, row[4], row[5] or "", row[6] or "", row[7] or "", row[8] or "", row[9] or "", row[10] or "", row[11] or "",
+                       row[12] or "", row[13] or "", row[14] if row[14] is not None else "", row[15] if row[15] is not None else ""]
+                score = sum(1 for value in out[4:] if value) + float(row[16] or 0)
+                key = dedupe_key(country, out[1], out[6], out[4]) or ("id:" + out[0])
+                digits = re.sub(r"\D", "", out[8])
+                if len(digits) >= 9:
+                    phone_key = f"{country}:{kind}:{digits[-10:]}:{norm_name(out[1])[:6]}"
+                    if phone_key in phones and phones[phone_key] != key:
+                        other = phones[phone_key]
+                        if other in best and best[other][0] >= score:
+                            continue
+                        best.pop(other, None)
+                    phones[phone_key] = key
+                if key not in best or best[key][0] < score:
+                    best[key] = (score, out)
+            for _, out in best.values():
+                writer.writerow(out)
                 rows_written += 1
             print(country, "rows", rows_written - before)
             if rows_written == before:

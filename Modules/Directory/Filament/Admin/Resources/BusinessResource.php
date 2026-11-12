@@ -13,9 +13,12 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\Action;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Modules\Admin\Support\Filament\ResourceTableActions;
 use Modules\Directory\Filament\Admin\Resources\BusinessResource\Pages;
 use Modules\Directory\Models\Business;
@@ -60,6 +63,14 @@ class BusinessResource extends Resource
             Select::make('owner_user_id')->label('Owner')->relationship('owner', 'email')->searchable()->preload(),
             Select::make('tier')->options(['basic' => 'Basic', 'plus' => 'Plus', 'premium' => 'Premium'])->default('basic')
                 ->helperText('Synced from the owner\'s membership every night. Set by hand only for sponsors without a subscription.'),
+            Select::make('accreditation')->options(Business::ACCREDITATIONS)->placeholder('None'),
+            Toggle::make('accreditation_verified')->label('Accreditation checked')
+                ->helperText('Check the official list (catfriendlyclinic.org for the UK, catfriendly.com for the US) before turning this on.'),
+            Toggle::make('emergency_care'),
+            Toggle::make('home_visits'),
+            Toggle::make('cat_only'),
+            TextInput::make('booking_url')->maxLength(200),
+            TextInput::make('new_client_offer')->maxLength(160),
             Toggle::make('is_verified')->label('Verified'),
             Toggle::make('is_published')->label('Published'),
         ]);
@@ -77,6 +88,9 @@ class BusinessResource extends Resource
                 IconColumn::make('is_verified')->boolean()->label('Verified'),
                 IconColumn::make('is_published')->boolean()->label('Live'),
                 TextColumn::make('view_count')->label('Views')->sortable(),
+                TextColumn::make('website_clicks')->label('Clicks')->sortable()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('email')->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('invited_at')->label('Invited')->since()->sortable()->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')->since()->sortable(),
             ])
             ->defaultSort('created_at', 'desc')
@@ -85,8 +99,24 @@ class BusinessResource extends Resource
                 SelectFilter::make('type')->options(Business::types()),
                 SelectFilter::make('country')->options(Business::countries()),
                 SelectFilter::make('tier')->options(['basic' => 'Basic', 'plus' => 'Plus', 'premium' => 'Premium']),
+                Filter::make('accreditation_to_check')->label('Accreditation to check')
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('accreditation')->where('accreditation_verified', false)),
+                TernaryFilter::make('claimed')->label('Claimed')
+                    ->queries(
+                        true: fn (Builder $query): Builder => $query->whereNotNull('owner_user_id'),
+                        false: fn (Builder $query): Builder => $query->whereNull('owner_user_id'),
+                    ),
+                Filter::make('invited')->label('Invited by email')->query(fn (Builder $query): Builder => $query->whereNotNull('invited_at')),
             ])
-            ->actions(ResourceTableActions::editDelete());
+            ->actions([
+                Action::make('verifyAccreditation')
+                    ->label('Accreditation OK')
+                    ->icon('heroicon-o-check-badge')
+                    ->color('success')
+                    ->visible(fn (Business $record): bool => filled($record->getAttribute('accreditation')) && ! $record->getAttribute('accreditation_verified'))
+                    ->action(fn (Business $record): bool => $record->forceFill(['accreditation_verified' => true])->save()),
+                ...ResourceTableActions::editDelete(),
+            ]);
     }
 
     public static function getPages(): array

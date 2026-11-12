@@ -17,6 +17,16 @@ return [
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
 
+        'outreach' => [
+            'transport' => 'smtp',
+            'host' => env('OUTREACH_MAIL_HOST', env('MAIL_HOST', '127.0.0.1')),
+            'port' => env('OUTREACH_MAIL_PORT', env('MAIL_PORT', 587)),
+            'username' => env('OUTREACH_MAIL_USERNAME'),
+            'password' => env('OUTREACH_MAIL_PASSWORD'),
+            'timeout' => 30,
+            'local_domain' => parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST),
+        ],
+
         'ses' => [
             'transport' => 'ses',
         ],

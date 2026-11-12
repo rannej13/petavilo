@@ -22,7 +22,22 @@ class Business extends Model
     protected $fillable = [
         'name', 'type', 'country', 'description', 'address_line', 'town', 'postcode', 'phone', 'email',
         'website', 'opening_hours', 'licence_number', 'owner_user_id', 'tier', 'is_verified', 'is_published',
+        'latitude', 'longitude', 'social_url', 'services', 'price_from', 'accreditation', 'emergency_care', 'home_visits',
+        'cat_only', 'new_client_offer', 'booking_url',
     ];
+
+    public const ACCREDITATIONS = [
+        'isfm_gold' => 'ISFM Cat Friendly Clinic: Gold',
+        'isfm_silver' => 'ISFM Cat Friendly Clinic: Silver',
+        'isfm_bronze' => 'ISFM Cat Friendly Clinic: Bronze',
+        'aafp_cfp' => 'AAFP Cat Friendly Practice',
+        'icc_cat_care' => 'International Cat Care trained',
+        'rcvs_psc' => 'RCVS accredited practice',
+    ];
+
+    public const FREE_PHOTOS = 3;
+
+    public const PAID_PHOTOS = 10;
 
     protected $casts = [
         'is_verified' => 'boolean',
@@ -30,6 +45,17 @@ class Business extends Model
         'claimed_at' => 'datetime',
         'tier_rank' => 'integer',
         'view_count' => 'integer',
+        'website_clicks' => 'integer',
+        'services' => 'array',
+        'photos' => 'array',
+        'emergency_care' => 'boolean',
+        'home_visits' => 'boolean',
+        'cat_only' => 'boolean',
+        'accreditation_verified' => 'boolean',
+        'latitude' => 'decimal:7',
+        'longitude' => 'decimal:7',
+        'invited_at' => 'datetime',
+        'unsubscribed_at' => 'datetime',
     ];
 
     protected static function booted(): void
@@ -38,6 +64,13 @@ class Business extends Model
             if (blank($business->getAttribute('slug')) || $business->isDirty('name')) {
                 $business->setAttribute('slug', self::uniqueSlug((string) $business->getAttribute('name'), (string) $business->getAttribute('town'), $business));
             }
+
+            $business->setAttribute('dedupe_key', self::dedupeKeyFor(
+                (string) $business->getAttribute('country'),
+                (string) $business->getAttribute('name'),
+                $business->getAttribute('postcode'),
+                $business->getAttribute('town'),
+            ));
 
             $tier = (string) ($business->getAttribute('tier') ?: 'basic');
             $business->setAttribute('tier_rank', self::TIERS[$tier] ?? 1);
@@ -180,14 +213,110 @@ class Business extends Model
 
     public function updateFromOwner(array $data): void
     {
-        $allowed = ['description', 'address_line', 'phone', 'email', 'website', 'opening_hours', 'licence_number'];
+        $allowed = [
+            'description', 'address_line', 'postcode', 'phone', 'email', 'website', 'opening_hours', 'licence_number',
+            'social_url', 'services', 'price_from', 'accreditation', 'emergency_care', 'home_visits', 'cat_only',
+            'booking_url', 'new_client_offer',
+        ];
 
         if (! $this->isPaid()) {
-            $allowed = array_values(array_diff($allowed, ['opening_hours']));
+            $allowed = array_values(array_diff($allowed, ['new_client_offer']));
             $data['description'] = Str::limit((string) ($data['description'] ?? ''), 300, '');
         }
 
+        if (array_key_exists('accreditation', $data) && $data['accreditation'] !== $this->getAttribute('accreditation')) {
+            $this->setAttribute('accreditation_verified', false);
+        }
+
         $this->fill(array_intersect_key($data, array_flip($allowed)))->save();
+    }
+
+    public static function dedupeKeyFor(string $country, string $name, mixed $postcode, mixed $town): ?string
+    {
+        $cleanName = Str::of($name)->lower()->ascii()
+            ->replaceMatches('/\b(the|ltd|limited|llc|inc|plc|llp|co|company|&|and)\b/', ' ')
+            ->replaceMatches('/[^a-z0-9]+/', '')
+            ->toString();
+
+        if ($cleanName === '') {
+            return null;
+        }
+
+        $place = Str::of((string) $postcode)->upper()->replaceMatches('/[^A-Z0-9]/', '')->toString();
+
+        if ($place === '') {
+            $place = Str::of((string) $town)->lower()->replaceMatches('/[^a-z0-9]+/', '')->toString();
+        }
+
+        return $place === '' ? null : Str::limit(strtoupper($country ?: 'GB').':'.$cleanName.':'.$place, 160, '');
+    }
+
+    public function photoUrls(): array
+    {
+        return collect((array) ($this->getAttribute('photos') ?? []))
+            ->filter(static fn (mixed $path): bool => is_string($path) && $path !== '')
+            ->map(static fn (string $path): string => asset('storage/'.ltrim($path, '/')))
+            ->values()
+            ->all();
+    }
+
+    public function logoUrl(): ?string
+    {
+        $path = trim((string) $this->getAttribute('logo_path'));
+
+        return $path === '' ? null : asset('storage/'.ltrim($path, '/'));
+    }
+
+    public function photoLimit(): int
+    {
+        return $this->isPaid() ? self::PAID_PHOTOS : self::FREE_PHOTOS;
+    }
+
+    public function accreditationLabel(): ?string
+    {
+        $key = (string) $this->getAttribute('accreditation');
+
+        return self::ACCREDITATIONS[$key] ?? null;
+    }
+
+    public function serviceList(): array
+    {
+        return collect((array) ($this->getAttribute('services') ?? []))
+            ->map(static fn (mixed $item): string => trim((string) $item))
+            ->filter()
+            ->unique()
+            ->take(20)
+            ->values()
+            ->all();
+    }
+
+    public function bookingUrl(): ?string
+    {
+        $url = trim((string) $this->getAttribute('booking_url'));
+
+        if ($url === '') {
+            return null;
+        }
+
+        return Str::startsWith($url, ['http://', 'https://']) ? $url : 'https://'.$url;
+    }
+
+    public function profileCompleteness(): int
+    {
+        $checks = [
+            filled($this->getAttribute('description')),
+            filled($this->getAttribute('phone')),
+            filled($this->getAttribute('website')),
+            filled($this->getAttribute('email')),
+            filled($this->getAttribute('opening_hours')),
+            $this->serviceList() !== [],
+            filled($this->getAttribute('logo_path')),
+            $this->photoUrls() !== [],
+            filled($this->getAttribute('address_line')),
+            filled($this->getAttribute('booking_url')),
+        ];
+
+        return (int) round(count(array_filter($checks)) / count($checks) * 100);
     }
 
     private static function uniqueSlug(string $name, string $town, self $record): string

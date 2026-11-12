@@ -14,4 +14,21 @@ return [
         'pet-transport' => ['name' => 'Pet transport', 'singular' => 'Pet transport'],
     ],
     'per_page' => 20,
+    'outreach' => [
+        'enabled' => (bool) env('OUTREACH_ENABLED', false),
+        'daily_limit' => (int) env('OUTREACH_DAILY_LIMIT', 30),
+        'mailer' => env('OUTREACH_MAILER', 'outreach'),
+        'from_address' => env('OUTREACH_FROM_ADDRESS'),
+        'from_name' => env('OUTREACH_FROM_NAME', env('SITE_NAME', 'Petavilo')),
+        'sender_name' => env('OUTREACH_SENDER_NAME', ''),
+        'countries' => array_values(array_filter(array_map('trim', explode(',', (string) env('OUTREACH_COUNTRIES', 'US,GB'))))),
+        'uk_types' => ['vets', 'rescues', 'pet-shops'],
+        'follow_up_after_days' => 14,
+        'max_emails' => 2,
+        'role_prefixes' => [
+            'info', 'hello', 'enquiries', 'enquiry', 'inquiries', 'contact', 'reception', 'admin', 'office', 'mail',
+            'bookings', 'booking', 'appointments', 'frontdesk', 'team', 'clinic', 'practice', 'vets', 'vet', 'shop',
+            'sales', 'support', 'help', 'care', 'adopt', 'adoptions', 'rehoming', 'general',
+        ],
+    ],
 ];
