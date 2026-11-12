@@ -46,6 +46,16 @@ class MonetisationSettings extends Settings
 
     public ?string $contact_email;
 
+    public ?string $mail_host;
+
+    public ?string $mail_port;
+
+    public ?string $mail_username;
+
+    public ?string $mail_password;
+
+    public ?string $mail_from_address;
+
     public static function group(): string
     {
         return 'monetisation';
@@ -53,6 +63,6 @@ class MonetisationSettings extends Settings
 
     public static function encrypted(): array
     {
-        return ['stripe_secret', 'stripe_webhook_secret'];
+        return ['stripe_secret', 'stripe_webhook_secret', 'mail_password'];
     }
 }

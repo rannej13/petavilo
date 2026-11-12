@@ -55,5 +55,36 @@ final class MonetisationConfig
                 config([$key => trim($value)]);
             }
         }
+
+        self::applyMail($settings);
+    }
+
+    private static function applyMail(MonetisationSettings $settings): void
+    {
+        $host = trim((string) ($settings->mail_host ?? ''));
+
+        if ($host === '') {
+            return;
+        }
+
+        $port = (int) ($settings->mail_port ?: 587);
+        $from = trim((string) ($settings->mail_from_address ?: $settings->contact_email ?: ''));
+
+        config([
+            'mail.default' => 'smtp',
+            'mail.mailers.smtp.host' => $host,
+            'mail.mailers.smtp.port' => $port,
+            'mail.mailers.smtp.scheme' => $port === 465 ? 'smtps' : 'smtp',
+            'mail.mailers.smtp.username' => trim((string) ($settings->mail_username ?? '')),
+            'mail.mailers.smtp.password' => (string) ($settings->mail_password ?? ''),
+        ]);
+
+        if ($from !== '') {
+            config(['mail.from.address' => $from, 'mail.from.name' => (string) config('app.name')]);
+        }
+
+        if (app()->resolved('mail.manager')) {
+            app('mail.manager')->forgetMailers();
+        }
     }
 }

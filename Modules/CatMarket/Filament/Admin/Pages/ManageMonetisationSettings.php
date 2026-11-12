@@ -5,6 +5,11 @@ declare(strict_types=1);
 namespace Modules\CatMarket\Filament\Admin\Pages;
 
 use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Mail;
+use Modules\CatMarket\Support\MonetisationConfig;
+use Throwable;
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\SettingsPage;
 use Filament\Schemas\Components\Section;
@@ -34,6 +39,15 @@ class ManageMonetisationSettings extends SettingsPage
                 ->schema([
                     TextInput::make('contact_email')->label('Contact email')->email()->placeholder('petavilo@outlook.com'),
                 ])->columns(1),
+            Section::make('Sending email')
+                ->description('Lets the site send sign-up, password reset and message emails. For Resend use host smtp.resend.com, port 587, username resend and your API key as the password.')
+                ->schema([
+                    TextInput::make('mail_host')->label('SMTP host')->placeholder('smtp.resend.com'),
+                    TextInput::make('mail_port')->label('Port')->placeholder('587'),
+                    TextInput::make('mail_username')->label('Username')->placeholder('resend'),
+                    TextInput::make('mail_password')->label('Password or API key')->password()->revealable()->placeholder('re_...'),
+                    TextInput::make('mail_from_address')->label('Send from')->email()->placeholder('hello@petavilo.com'),
+                ])->columns(2),
             Section::make('Stripe')
                 ->description('Stripe dashboard > Developers > API keys. The webhook signing secret is shown after you add the webhook endpoint https://yourdomain/stripe/webhook.')
                 ->schema([
@@ -69,6 +83,27 @@ class ManageMonetisationSettings extends SettingsPage
                     TextInput::make('amazon_tag_us')->label('US tag (amazon.com)')->placeholder('petavilo-20'),
                 ])->columns(2),
         ]);
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('sendTestEmail')
+                ->label('Send test email')
+                ->action(function (): void {
+                    MonetisationConfig::apply();
+                    $to = (string) auth()->user()?->email;
+
+                    try {
+                        Mail::raw('This is a test email from Petavilo. If you can read this, sending works.', function ($message) use ($to): void {
+                            $message->to($to)->subject('Petavilo test email');
+                        });
+                        Notification::make()->title('Test email sent to '.$to)->success()->send();
+                    } catch (Throwable $exception) {
+                        Notification::make()->title('Sending failed')->body(mb_substr($exception->getMessage(), 0, 300))->danger()->send();
+                    }
+                }),
+        ];
     }
 
     protected function afterSave(): void
