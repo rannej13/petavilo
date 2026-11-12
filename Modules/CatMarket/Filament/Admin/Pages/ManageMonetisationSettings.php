@@ -29,6 +29,11 @@ class ManageMonetisationSettings extends SettingsPage
     public function form(Schema $schema): Schema
     {
         return $schema->schema([
+            Section::make('Contact')
+                ->description('Shown on the contact, legal and help pages, and used as the reply address on claim invitations.')
+                ->schema([
+                    TextInput::make('contact_email')->label('Contact email')->email()->placeholder('petavilo@outlook.com'),
+                ])->columns(1),
             Section::make('Stripe')
                 ->description('Stripe dashboard > Developers > API keys. The webhook signing secret is shown after you add the webhook endpoint https://yourdomain/stripe/webhook.')
                 ->schema([
@@ -64,5 +69,14 @@ class ManageMonetisationSettings extends SettingsPage
                     TextInput::make('amazon_tag_us')->label('US tag (amazon.com)')->placeholder('petavilo-20'),
                 ])->columns(2),
         ]);
+    }
+
+    protected function afterSave(): void
+    {
+        $email = trim((string) ($this->data['contact_email'] ?? ''));
+
+        if ($email !== '') {
+            \Modules\CatMarket\Support\ContactEmail::sync($email);
+        }
     }
 }

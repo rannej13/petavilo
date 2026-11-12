@@ -44,6 +44,8 @@ class MonetisationSettings extends Settings
 
     public ?string $amazon_tag_us;
 
+    public ?string $contact_email;
+
     public static function group(): string
     {
         return 'monetisation';

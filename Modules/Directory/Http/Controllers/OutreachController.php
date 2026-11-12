@@ -8,6 +8,10 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Str;
+use Modules\Directory\Mail\ClaimInvitation;
+use Modules\Directory\Support\OutreachPolicy;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Modules\Directory\Models\Business;
 use Modules\Directory\Models\BusinessClaim;
 use Modules\Directory\Models\DirectorySuppression;
@@ -79,6 +83,59 @@ class OutreachController extends Controller
         Business::query()->whereKey($business->getKey())->increment('website_clicks');
 
         return redirect()->away($url);
+    }
+
+    public function export(Request $request): StreamedResponse
+    {
+        abort_unless($request->user()?->hasRole('admin'), 403);
+
+        $limit = max(1, (int) config('directory.outreach.daily_limit', 30));
+        $rows = [];
+
+        foreach (OutreachPolicy::candidates()->cursor() as $business) {
+            if (count($rows) >= $limit) {
+                break;
+            }
+
+            if (OutreachPolicy::reasonToSkip($business) !== null) {
+                $business->forceFill(['invite_count' => 99])->saveQuietly();
+
+                continue;
+            }
+
+            if (blank($business->getAttribute('invite_token'))) {
+                $business->forceFill(['invite_token' => Str::random(40)])->saveQuietly();
+            }
+
+            $isFollowUp = (int) $business->getAttribute('invite_count') > 0;
+            $mail = new ClaimInvitation($business, $isFollowUp);
+            $content = $mail->content();
+
+            $rows[] = [
+                (string) $business->getAttribute('email'),
+                (string) $business->getAttribute('name'),
+                (string) $business->getAttribute('country'),
+                $mail->envelope()->subject,
+                trim(view((string) $content->text, $content->with)->render()),
+            ];
+
+            $business->forceFill([
+                'invited_at' => now(),
+                'invite_count' => (int) $business->getAttribute('invite_count') + 1,
+            ])->saveQuietly();
+        }
+
+        return response()->streamDownload(static function () use ($rows): void {
+            $out = fopen('php://output', 'wb');
+            fwrite($out, "\xEF\xBB\xBF");
+            fputcsv($out, ['email', 'business', 'country', 'subject', 'message']);
+
+            foreach ($rows as $row) {
+                fputcsv($out, $row);
+            }
+
+            fclose($out);
+        }, 'petavilo-invites-'.now()->format('Y-m-d').'.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 
     private function findByToken(string $token, bool $mustBeUnclaimed = true): Business

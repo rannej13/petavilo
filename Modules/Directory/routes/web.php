@@ -20,6 +20,7 @@ Route::middleware('web')->group(function (): void {
         Route::post('/directory/add', [DirectoryController::class, 'store'])->name('directory.store')->middleware('throttle:5,60');
         Route::post('/directory/{type}/{slug}/claim', [DirectoryController::class, 'claim'])->name('directory.claim')->middleware('throttle:5,60');
         Route::get('/panel/business', [BusinessPanelController::class, 'index'])->name('directory.panel.index');
+        Route::get('/admin-tools/directory/invites.csv', [OutreachController::class, 'export'])->name('directory.admin.invites');
         Route::put('/panel/business/{business}', [BusinessPanelController::class, 'update'])->name('directory.panel.update');
     });
 

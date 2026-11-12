@@ -20,7 +20,7 @@ class ListBusinesses extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        $ready = filled(config('directory.outreach.from_address'));
+        $ready = filled(config('mail.mailers.outreach.username')) && filled(config('mail.mailers.outreach.password'));
 
         return [
             ActionGroup::make([
@@ -35,10 +35,16 @@ class ListBusinesses extends ListRecords
                         number_format(Business::query()->whereNotNull('owner_user_id')->count()),
                         $ready
                             ? ((bool) config('directory.outreach.enabled') ? 'Sending automatically on weekdays.' : 'Automatic sending is off (OUTREACH_ENABLED=false).')
-                            : 'No sending mailbox set yet (OUTREACH_FROM_ADDRESS and OUTREACH_MAIL_* in .env).',
+                            : 'No sending mailbox connected, so use "Download invite list" and send from your own mailbox.',
                         (int) config('directory.outreach.daily_limit', 30),
                     ))
                     ->modalSubmitAction(false),
+                Action::make('outreachExport')
+                    ->label('Download invite list to send from Outlook')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->modalDescription(fn (): string => 'Downloads up to '.(int) config('directory.outreach.daily_limit', 30).' businesses with their email, a subject and a ready-to-paste message containing their personal claim link. They are marked as invited, so tomorrow\'s list is different. Send them from your own mailbox, a few at a time.')
+                    ->requiresConfirmation()
+                    ->action(fn () => redirect()->route('directory.admin.invites')),
                 Action::make('outreachTest')
                     ->label('Send me a test email')
                     ->icon('heroicon-o-envelope')

@@ -17,6 +17,8 @@ class CatPageSeeder extends Seeder
 
         Page::query()->whereNotIn('slug', array_column($this->records(), 'slug'))->update(['is_published' => false]);
 
+        \Modules\CatMarket\Support\ContactEmail::sync();
+
         $about = Page::query()->where('slug', 'about')->first();
 
         if ($about instanceof Page && str_contains((string) $about->getAttribute('body'), "\n\nWho we are\n")) {

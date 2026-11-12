@@ -46,6 +46,8 @@ final class MonetisationConfig
             'ads.slots.directory' => $settings->adsense_slot_directory,
             'catmarket.amazon.uk' => $settings->amazon_tag_uk,
             'catmarket.amazon.us' => $settings->amazon_tag_us,
+            'catmarket.company.email' => $settings->contact_email,
+            'directory.outreach.from_address' => $settings->contact_email,
         ];
 
         foreach ($map as $key => $value) {

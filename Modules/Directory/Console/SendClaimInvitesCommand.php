@@ -24,8 +24,8 @@ class SendClaimInvitesCommand extends Command
         $dryRun = (bool) $this->option('dry-run');
         $testTo = trim((string) $this->option('to'));
 
-        if (! $dryRun && $testTo === '' && blank(config('directory.outreach.from_address'))) {
-            $this->error('Set OUTREACH_FROM_ADDRESS and the OUTREACH_MAIL_* settings in .env first.');
+        if (! $dryRun && (blank(config('mail.mailers.outreach.username')) || blank(config('mail.mailers.outreach.password')))) {
+            $this->error('No sending mailbox is connected (OUTREACH_MAIL_* in .env). Use the invite list download instead.');
 
             return self::FAILURE;
         }
