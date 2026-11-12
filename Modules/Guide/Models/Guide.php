@@ -24,7 +24,7 @@ class Guide extends Model
     ];
 
     protected $fillable = [
-        'title', 'slug', 'type', 'excerpt', 'body', 'has_affiliate_links', 'sponsor_name', 'author_name',
+        'title', 'slug', 'type', 'excerpt', 'cover_image', 'body', 'has_affiliate_links', 'sponsor_name', 'author_name',
         'meta_title', 'meta_description', 'reviewed_on', 'is_published', 'published_at',
     ];
 
@@ -80,6 +80,18 @@ class Guide extends Model
             ->latest('published_at')
             ->limit($limit)
             ->get();
+    }
+
+    public function coverUrl(): ?string
+    {
+        $path = trim((string) $this->getAttribute('cover_image'));
+
+        if ($path !== '' && \Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+            return asset('storage/'.ltrim($path, '/'));
+        }
+
+        return \Modules\CatMarket\Support\SiteImages::url('guide-'.(string) $this->getAttribute('type'))
+            ?? \Modules\CatMarket\Support\SiteImages::url('hero');
     }
 
     public function typeLabel(): string

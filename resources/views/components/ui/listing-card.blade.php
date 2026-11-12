@@ -24,6 +24,9 @@
             @if($isFeatured)
                 <span class="badge badge--solid">{{ __('promotion::messages.featured_badge') }}</span>
             @endif
+            @if((bool) $listing->getAttribute('is_example'))
+                <span class="badge">{{ __('catmarket::messages.example_badge') }}</span>
+            @endif
             @if((bool) $listing->getAttribute('is_urgent'))
                 <span class="badge badge--caution">{{ __('promotion::messages.urgent_badge') }}</span>
             @endif

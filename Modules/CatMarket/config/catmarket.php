@@ -14,6 +14,14 @@ return [
         'products' => 'https://www.figma.com/api/mcp/asset/ca33e1b4-366f-4e7a-86d6-2809ef3432c3.png',
         'pedigree' => 'https://www.figma.com/api/mcp/asset/e8ef7044-2887-4757-8915-26ea36ccbfe1.png',
         'lost-found' => 'https://www.figma.com/api/mcp/asset/5df6693a-675b-4b15-aa08-eeae72941350.png',
+        'guide-care' => 'https://www.figma.com/api/mcp/asset/8a12b11e-91ec-48f7-b2a9-7151d242badb.png',
+        'guide-breed' => 'https://www.figma.com/api/mcp/asset/1d058468-0f33-4e33-ac77-27a21fbca693.png',
+        'guide-buying' => 'https://www.figma.com/api/mcp/asset/91b60563-1d80-4324-8b9a-2c79bd59fb41.png',
+        'guide-comparison' => 'https://www.figma.com/api/mcp/asset/cca4294a-86e7-469c-adfe-eaf172ccee6a.png',
+        'guide-insurance' => 'https://www.figma.com/api/mcp/asset/f922f14f-0bc5-4417-9bd6-31c46239a4d1.png',
+        'example-ragdoll' => 'https://www.figma.com/api/mcp/asset/690f56ac-ed57-4abf-8a44-15f9dc99b602.png',
+        'example-cat-tree' => 'https://www.figma.com/api/mcp/asset/c829a729-8968-483c-ad6c-8d6ad5524f41.png',
+        'example-bengal' => 'https://www.figma.com/api/mcp/asset/d12a7728-6816-4b14-8cba-c9c2f22a4799.png',
     ],
     'category_images' => [
         'cats-for-rehoming' => 'rehoming',
@@ -23,6 +31,8 @@ return [
         'cat-products' => 'products',
         'cat-services' => 'services',
     ],
+    'show_examples' => (bool) env('SHOW_EXAMPLE_ADVERTS', true),
+    'americas' => ['US', 'CA', 'MX', 'GT', 'BZ', 'SV', 'HN', 'NI', 'CR', 'PA', 'CU', 'DO', 'HT', 'JM', 'BS', 'BB', 'TT', 'AG', 'DM', 'GD', 'KN', 'LC', 'VC', 'PR', 'VI', 'VG', 'AI', 'BM', 'KY', 'TC', 'MS', 'AW', 'CW', 'SX', 'BQ', 'GP', 'MQ', 'BL', 'MF', 'PM', 'GL', 'CO', 'VE', 'EC', 'PE', 'BO', 'PY', 'UY', 'AR', 'CL', 'BR', 'GY', 'SR', 'GF', 'FK', 'UM', 'AS', 'GU', 'MP'],
     'forum_url' => env('FORUM_URL'),
     'show_company_details' => (bool) env('SHOW_COMPANY_DETAILS', false),
     'countries' => [

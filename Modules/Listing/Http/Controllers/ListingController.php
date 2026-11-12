@@ -29,6 +29,11 @@ class ListingController extends Controller
         $categoryId = $this->positiveInteger('category');
         $countryId = $this->positiveInteger('country');
         $cityId = $this->positiveInteger('city');
+
+        if (! request()->has('country') && $cityId === null) {
+            $countryId = \Modules\CatMarket\Support\CatMarketSettings::visitorCountryId();
+        }
+
         $sellerUserId = $this->positiveInteger('user');
         $minPriceInput = trim((string) request('min_price', ''));
         $maxPriceInput = trim((string) request('max_price', ''));

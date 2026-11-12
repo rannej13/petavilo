@@ -28,6 +28,7 @@ class CatMarketSeeder extends Seeder
             CatPageSeeder::class,
             GuideSeeder::class,
             DirectorySeeder::class,
+            ExampleListingSeeder::class,
         ]);
     }
 }

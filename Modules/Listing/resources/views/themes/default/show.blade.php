@@ -105,7 +105,13 @@
                             </div>
                         @endif
 
+                        @if($listing->getAttribute('is_example'))
+                            <div class="notice notice--accent">{{ __('catmarket::messages.example_notice') }}</div>
+                        @endif
+
                         @include('catmarket::partials.listing-welfare', ['listing' => $listing])
+
+                        @include('catmarket::partials.listing-map', ['listing' => $listing])
 
                         <x-ads::slot name="listing_detail"/>
 

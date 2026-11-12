@@ -22,6 +22,9 @@
             <div class="grid grid--three">
                 @foreach($guides as $guide)
                     <a href="{{ route('guides.show', $guide->getAttribute('slug')) }}" class="card">
+                        @if($cover = $guide->coverUrl())
+                            <img src="{{ $cover }}" alt="" class="card__image" loading="lazy" decoding="async">
+                        @endif
                         <div class="card__body stack stack--tight">
                             <p class="text-eyebrow">{{ $guide->typeLabel() }}</p>
                             <h2 class="title-card">{{ $guide->getAttribute('title') }}</h2>

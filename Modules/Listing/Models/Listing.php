@@ -57,6 +57,7 @@ class Listing extends Model implements HasMedia
         'custom_fields' => 'array',
         'is_featured' => 'boolean',
         'is_urgent' => 'boolean',
+        'is_example' => 'boolean',
         'bumped_at' => 'datetime',
         'view_count' => 'integer',
         'expires_at' => 'datetime',

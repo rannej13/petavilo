@@ -14,6 +14,7 @@
 
 @section('title', $guide->metaTitleValue())
 @section('description', $guide->metaDescriptionValue())
+@section('og_image', $guide->coverUrl() ?? '')
 
 @section('content')
 <div class="shell shell--narrow page">
@@ -34,6 +35,10 @@
                 @if($guide->getAttribute('reviewed_on')){{ __('guide::messages.reviewed', ['date' => $guide->getAttribute('reviewed_on')->isoFormat('LL')]) }}@endif
             </p>
         </header>
+
+        @if($cover = $guide->coverUrl())
+            <img src="{{ $cover }}" alt="{{ $guide->getAttribute('title') }}" class="guide-hero" fetchpriority="high">
+        @endif
 
         @if($guide->getAttribute('has_affiliate_links') || filled($guide->getAttribute('sponsor_name')))
             <x-ads::affiliate-disclosure :sponsor="$guide->getAttribute('sponsor_name')"/>

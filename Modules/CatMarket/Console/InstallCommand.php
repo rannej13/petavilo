@@ -23,6 +23,8 @@ class InstallCommand extends Command
 
         if ($disk->exists(self::MARKER) && ! $this->option('force')) {
             $this->call('db:seed', ['--class' => AdminUserSeeder::class, '--force' => true]);
+            $this->call('db:seed', ['--class' => \Modules\CatMarket\Database\Seeders\CatPageSeeder::class, '--force' => true]);
+            $this->call('db:seed', ['--class' => \Modules\CatMarket\Database\Seeders\ExampleListingSeeder::class, '--force' => true]);
             $this->info('Already installed. Admin user checked.');
 
             return self::SUCCESS;

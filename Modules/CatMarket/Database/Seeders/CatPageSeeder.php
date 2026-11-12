@@ -16,6 +16,12 @@ class CatPageSeeder extends Seeder
         }
 
         Page::query()->whereNotIn('slug', array_column($this->records(), 'slug'))->update(['is_published' => false]);
+
+        $about = Page::query()->where('slug', 'about')->first();
+
+        if ($about instanceof Page && str_contains((string) $about->getAttribute('body'), "\n\nWho we are\n")) {
+            $about->update(['body' => trim(strstr((string) $about->getAttribute('body'), "\n\nWho we are\n", true))]);
+        }
     }
 
     private function records(): array
@@ -42,7 +48,7 @@ class CatPageSeeder extends Seeder
                 'placement' => Page::PLACEMENT_FOOTER,
                 'sort_order' => 1,
                 'meta_description' => "{$site}: cats for rehoming, kittens, cat products and trusted cat services across the UK and US.",
-                'body' => "Why we exist\n{$site} helps cats find good homes and helps owners find the products and people they need. We care more about the right home than a quick sale.\n\nHow we keep it safe\nWe review adverts for cats and kittens and act quickly on anything reported. We follow the Pet Advertising Advisory Group (PAAG) standards, show licence numbers for licensed sellers, and ask for microchip and vaccination details on every animal advert.\n\nHow we make money\nPosting an advert to rehome a cat is free, and so is Lost & Found. We earn from optional featured adverts, memberships for breeders and businesses, advertising and affiliate links. None of these change whether an advert is approved.\n\nWho we are\n{$operator}",
+                'body' => "Why we exist\n{$site} helps cats find good homes and helps owners find the products and people they need. We care more about the right home than a quick sale.\n\nHow we keep it safe\nWe review adverts for cats and kittens and act quickly on anything reported. We follow the Pet Advertising Advisory Group (PAAG) standards, show licence numbers for licensed sellers, and ask for microchip and vaccination details on every animal advert.\n\nHow we make money\nPosting an advert to rehome a cat is free, and so is Lost & Found. We earn from optional featured adverts, memberships for breeders and businesses, advertising and affiliate links. None of these change whether an advert is approved.",
             ],
             [
                 'slug' => 'contact',

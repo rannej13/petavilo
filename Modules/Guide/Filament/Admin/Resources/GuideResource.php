@@ -7,6 +7,7 @@ namespace Modules\Guide\Filament\Admin\Resources;
 use BackedEnum;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -50,7 +51,10 @@ class GuideResource extends Resource
             TextInput::make('slug')->required()->maxLength(160)->unique(ignoreRecord: true),
             Select::make('type')->options(Guide::TYPES)->required(),
             Textarea::make('excerpt')->rows(2)->maxLength(320),
+            FileUpload::make('cover_image')->image()->disk('public')->directory('guides')->visibility('public')->maxSize(6144)
+                ->helperText('Optional. Without one, a picture matching the guide type is used.'),
             MarkdownEditor::make('body')
+                ->fileAttachmentsDisk('public')->fileAttachmentsDirectory('guides')->fileAttachmentsVisibility('public')
                 ->columnSpanFull()
                 ->helperText('Use ## for section headings. Tables are supported. External links are marked sponsored automatically.'),
             Toggle::make('has_affiliate_links')->helperText('Shows the affiliate disclosure at the top. Turned on automatically for Amazon links.'),

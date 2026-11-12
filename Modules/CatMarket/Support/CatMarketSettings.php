@@ -56,8 +56,43 @@ final class CatMarketSettings
             return $chosen;
         }
 
-        $header = strtoupper((string) $request->header('CF-IPCountry', ''));
+        $country = strtoupper((string) ($request->header('CF-IPCountry') ?? $request->header('X-Country-Code') ?? ''));
 
-        return $header === 'US' ? 'US' : 'GB';
+        if (! preg_match('/^[A-Z]{2}$/', $country)) {
+            $country = self::countryFromLanguage((string) $request->header('Accept-Language', ''));
+        }
+
+        return self::regionFor($country);
+    }
+
+    public static function regionFor(string $countryCode): string
+    {
+        return in_array(strtoupper($countryCode), (array) config('catmarket.americas', ['US']), true) ? 'US' : 'GB';
+    }
+
+    public static function visitorCountryId(): ?int
+    {
+        $name = (string) (config('catmarket.countries')[self::visitorCountry()]['name'] ?? '');
+
+        if ($name === '') {
+            return null;
+        }
+
+        $id = \Modules\Location\Models\Country::query()->where('name', $name)->value('id');
+
+        return $id === null ? null : (int) $id;
+    }
+
+    private static function countryFromLanguage(string $header): string
+    {
+        foreach (explode(',', $header) as $part) {
+            $tag = trim(explode(';', $part)[0]);
+
+            if (preg_match('/^[a-z]{2,3}[-_]([A-Za-z]{2})$/', $tag, $match) === 1) {
+                return strtoupper($match[1]);
+            }
+        }
+
+        return '';
     }
 }

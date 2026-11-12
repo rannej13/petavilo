@@ -37,4 +37,9 @@ return [
     'community' => 'Community forum',
     'yes' => 'Yes',
     'no' => 'No',
+    'example_badge' => 'Example',
+    'example_notice' => 'This is an example advert to show how the site works. It is not a real cat or item and you cannot contact the seller.',
+    'map_title' => 'Approximate area',
+    'map_note' => 'The map shows the rough area only, never the exact address.',
+    'map_open' => 'Open larger map',
 ];
