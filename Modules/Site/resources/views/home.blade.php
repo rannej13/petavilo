@@ -28,9 +28,9 @@
             </form>
 
             <div class="hero__stats">
-                <span class="hero__stat"><strong>{{ number_format($listingCount) }}</strong> {{ __('site::messages.active_listings') }}</span>
-                <span class="hero__stat"><strong>{{ number_format($categoryCount) }}</strong> {{ __('site::messages.categories') }}</span>
-                <span class="hero__stat"><strong>{{ number_format($userCount) }}</strong> {{ __('site::messages.members') }}</span>
+                @foreach($heroStats as [$number, $label])
+                    <span class="hero__stat"><strong>{{ $number }}</strong> {{ $label }}</span>
+                @endforeach
             </div>
         </div>
     </div>
