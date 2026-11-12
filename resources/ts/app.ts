@@ -11,6 +11,7 @@ import { listingGallery } from './modules/gallery';
 import { locationPicker } from './modules/location-picker';
 import { contactReveal, shareAction } from './modules/reveal';
 import { disclosureGroup, navigationDrawer, searchSuggest, stickyHeader } from './modules/navigation';
+import { installVideoCompressor } from './modules/video-compress';
 
 const behaviors: readonly Behavior<never>[] = [
     navigationDrawer,
@@ -39,6 +40,7 @@ const behaviors: readonly Behavior<never>[] = [
 ];
 
 function boot(): void {
+    installVideoCompressor();
     startBehaviors(behaviors);
 }
 
