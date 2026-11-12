@@ -42,7 +42,7 @@ class DirectoryController extends Controller
             'types' => Business::types(),
             'town' => $town,
             'search' => $search,
-            'towns' => Business::towns($region),
+            'towns' => Business::towns($region, $type),
             'businesses' => Business::browse($type, $town, $search, $region),
             'region' => $region,
         ]);

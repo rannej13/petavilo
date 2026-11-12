@@ -1,7 +1,7 @@
 @extends('site::layouts.app')
 
 @section('title', $typeName.($town !== '' ? ' in '.$town : ''))
-@section('description', $typeName.' for cats'.($town !== '' ? ' in '.$town : ' across the UK').'.')
+@section('description', $typeName.' for cats'.($town !== '' ? ' in '.$town : ' across the '.($region === 'US' ? 'US' : 'UK')).'.')
 
 @section('content')
 <div class="shell shell--wide page">
@@ -35,12 +35,12 @@
             </div>
             <div class="field">
                 <label class="field__label" for="directory-town">{{ __('directory::messages.town') }}</label>
-                <select id="directory-town" name="town" class="select">
-                    <option value="">{{ __('directory::messages.all_towns') }}</option>
+                <input id="directory-town" name="town" class="input" list="directory-towns" value="{{ $town }}" placeholder="{{ __('directory::messages.all_towns') }}" autocomplete="off">
+                <datalist id="directory-towns">
                     @foreach($towns as $option)
-                        <option value="{{ $option }}" @selected($option === $town)>{{ $option }}</option>
+                        <option value="{{ $option }}"></option>
                     @endforeach
-                </select>
+                </datalist>
             </div>
             <button type="submit" class="button button--secondary">{{ __('directory::messages.filter') }}</button>
         </form>

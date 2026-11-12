@@ -84,7 +84,7 @@ class Business extends Model
             ->published()
             ->where('type', $type)
             ->where('country', $country)
-            ->when($town !== '', static fn (Builder $query): Builder => $query->where('town', 'ilike', $town))
+            ->when($town !== '', static fn (Builder $query): Builder => $query->where('town', 'ilike', $town.'%'))
             ->when($search !== '', static fn (Builder $query): Builder => $query->where(static fn (Builder $inner): Builder => $inner
                 ->where('name', 'ilike', '%'.$search.'%')
                 ->orWhere('postcode', 'ilike', $search.'%')
@@ -101,14 +101,29 @@ class Business extends Model
 
     public static function countsByType(string $country = 'GB'): array
     {
-        return static::query()->published()->where('country', $country)
+        return \Illuminate\Support\Facades\Cache::remember('directory-counts:'.$country, now()->addMinutes(30), static fn (): array => static::query()->published()->where('country', $country)
             ->selectRaw('type, COUNT(*) as aggregate')->groupBy('type')
-            ->pluck('aggregate', 'type')->map(static fn (mixed $count): int => (int) $count)->all();
+            ->pluck('aggregate', 'type')->map(static fn (mixed $count): int => (int) $count)->all());
     }
 
-    public static function towns(string $country = 'GB'): array
+    public static function towns(string $country = 'GB', ?string $type = null, int $limit = 300): array
     {
-        return static::query()->published()->where('country', $country)->whereNotNull('town')->distinct()->orderBy('town')->pluck('town')->all();
+        return \Illuminate\Support\Facades\Cache::remember(
+            'directory-towns:'.$country.':'.($type ?? 'all').':'.$limit,
+            now()->addHours(6),
+            static fn (): array => static::query()->published()
+                ->where('country', $country)
+                ->when($type !== null, static fn (Builder $query): Builder => $query->where('type', $type))
+                ->whereNotNull('town')->where('town', '!=', '')
+                ->selectRaw('town, COUNT(*) as aggregate')
+                ->groupBy('town')
+                ->orderByDesc('aggregate')
+                ->limit($limit)
+                ->pluck('town')
+                ->sort(SORT_NATURAL | SORT_FLAG_CASE)
+                ->values()
+                ->all(),
+        );
     }
 
     public static function findPublished(string $type, string $slug): ?self

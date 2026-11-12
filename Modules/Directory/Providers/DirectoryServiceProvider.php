@@ -35,7 +35,10 @@ class DirectoryServiceProvider extends ServiceProvider
         SitemapRegistry::register(static fn (): array => [
             ['url' => route('directory.index')],
             ...collect(array_keys(Business::types()))->map(static fn (string $type): array => ['url' => route('directory.type', $type)])->all(),
-            ...Business::query()->published()->get(['type', 'slug', 'updated_at'])->map(static fn (Business $business): array => [
+            ...Business::query()->published()
+                ->where(static fn ($query) => $query->whereNull('source')->orWhereNotNull('owner_user_id'))
+                ->latest('updated_at')->limit(20000)
+                ->get(['type', 'slug', 'updated_at'])->map(static fn (Business $business): array => [
                 'url' => route('directory.show', [$business->getAttribute('type'), $business->getAttribute('slug')]),
                 'updated' => $business->getAttribute('updated_at')?->toAtomString(),
             ])->all(),
