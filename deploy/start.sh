@@ -22,6 +22,8 @@ until php artisan migrate --force; do
 done
 
 php artisan migrate --path=database/settings --force
+php artisan settings:clear-cache || true
+php artisan settings:clear-discovered || true
 php artisan catmarket:install
 php artisan catmarket:images || true
 php artisan storage:link || true
