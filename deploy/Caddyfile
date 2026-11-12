@@ -1,0 +1,20 @@
+{$SITE_ADDRESS} {
+	encode zstd gzip
+	reverse_proxy app:80 {
+		header_up X-Forwarded-Proto {scheme}
+	}
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+}
+
+{$REDIRECT_ADDRESS:http://redirect.invalid} {
+	redir https://{$PRIMARY_HOST:localhost}{uri} permanent
+}
+
+{$FORUM_ADDRESS::8081} {
+	encode zstd gzip
+	reverse_proxy forum:8888
+}

@@ -1,0 +1,193 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\Listing\Http\Controllers;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
+use Modules\Category\Models\Category;
+use Modules\Conversation\App\Models\Conversation;
+use Modules\Favorite\App\Models\FavoriteSearch;
+use Modules\Favorite\App\Models\FavoriteSeller;
+use Modules\Listing\Models\Listing;
+use Modules\Listing\Support\ListingCustomFieldSchemaBuilder;
+use Modules\Location\Models\Country;
+use Modules\Offer\Models\Offer;
+use Modules\Report\Models\Report;
+use Modules\Review\Models\Review;
+use Modules\Theme\Support\ThemeManager;
+
+class ListingController extends Controller
+{
+    public function __construct(private ThemeManager $themes) {}
+
+    public function index(): View
+    {
+        $search = trim((string) request('search', ''));
+        $categoryId = $this->positiveInteger('category');
+        $countryId = $this->positiveInteger('country');
+        $cityId = $this->positiveInteger('city');
+        $sellerUserId = $this->positiveInteger('user');
+        $minPriceInput = trim((string) request('min_price', ''));
+        $maxPriceInput = trim((string) request('max_price', ''));
+        $minPrice = is_numeric($minPriceInput) ? max((float) $minPriceInput, 0) : null;
+        $maxPrice = is_numeric($maxPriceInput) ? max((float) $maxPriceInput, 0) : null;
+        $dateFilter = $this->oneOf('date_filter', ['all', 'today', 'week', 'month']);
+        $sort = $this->oneOf('sort', ['smart', 'newest', 'oldest', 'price_asc', 'price_desc']);
+
+        $locationSelection = Country::browseSelection($countryId, $cityId);
+        $countryId = $locationSelection['country_id'];
+        $cityId = $locationSelection['city_id'];
+        $countries = $locationSelection['countries'];
+        $cities = $locationSelection['cities'];
+        $selectedCountryName = $locationSelection['selected_country_name'];
+        $selectedCityName = $locationSelection['selected_city_name'];
+
+        $listingDirectory = Category::listingDirectory($categoryId);
+
+        $browseFilters = [
+            'search' => $search,
+            'country' => $selectedCountryName,
+            'city' => $selectedCityName,
+            'user_id' => $sellerUserId,
+            'min_price' => $minPrice,
+            'max_price' => $maxPrice,
+            'date_filter' => $dateFilter,
+        ];
+
+        [
+            'allTotal' => $allListingsTotal,
+            'filteredTotal' => $filteredListingsTotal,
+            'listings' => $listings,
+        ] = Listing::browse($browseFilters, $listingDirectory['filterIds'], $sort);
+
+        $categories = $listingDirectory['categories'];
+        $selectedCategory = $listingDirectory['selectedCategory'];
+
+        $favoriteListingIds = [];
+        $isCurrentSearchSaved = false;
+        $conversationListingMap = [];
+
+        if (auth()->check()) {
+            $userId = (int) auth()->id();
+
+            $favoriteListingIds = auth()->user()->favoriteListingIds();
+            $conversationListingMap = $listings->isEmpty() ? [] : Conversation::listingMapForBuyer($userId, $listings->pluck('id')->all());
+
+            $isCurrentSearchSaved = FavoriteSearch::isSavedForUser(auth()->user(), [
+                'search' => $search,
+                'category' => $categoryId,
+            ]);
+        }
+
+        return view($this->themes->view('listing', 'index'), compact(
+            'listings',
+            'search',
+            'categoryId',
+            'countryId',
+            'cityId',
+            'sellerUserId',
+            'minPriceInput',
+            'maxPriceInput',
+            'dateFilter',
+            'sort',
+            'countries',
+            'cities',
+            'selectedCategory',
+            'categories',
+            'favoriteListingIds',
+            'isCurrentSearchSaved',
+            'conversationListingMap',
+            'allListingsTotal',
+            'filteredListingsTotal',
+        ));
+    }
+
+    public function show(Listing $listing): View
+    {
+        abort_unless($listing->isVisibleTo(auth()->user()), 404);
+
+        $listing->trackViewBy(auth()->id());
+
+        $listing->loadDetail();
+        $presentableCustomFields = ListingCustomFieldSchemaBuilder::presentableValues(
+            $listing->category_id ? (int) $listing->category_id : null,
+            $listing->custom_fields ?? [],
+        );
+        $gallery = $listing->galleryImageData();
+        $listingVideos = $listing->getRelation('videos');
+        $relatedListings = $listing->relatedSuggestions(12);
+        $themePillCategories = Category::themePills(10);
+        $breadcrumbCategories = $listing->category
+            ? $listing->category->breadcrumbTrail()
+            : collect();
+
+        $isListingFavorited = false;
+        $isSellerFavorited = false;
+        $detailConversation = null;
+
+        if (auth()->check()) {
+            $userId = (int) auth()->id();
+
+            $isListingFavorited = in_array((int) $listing->getKey(), auth()->user()->favoriteListingIds(), true);
+
+            if ($listing->user_id) {
+                $isSellerFavorited = FavoriteSeller::contains($userId, (int) $listing->user_id);
+            }
+
+            if ($listing->user_id && (int) $listing->user_id !== $userId) {
+                $detailConversation = Conversation::detailForBuyerListing(
+                    (int) $listing->getKey(),
+                    $userId,
+                );
+            }
+        }
+
+        $sellerId = $listing->getAttribute('user_id') === null ? null : (int) $listing->getAttribute('user_id');
+        $sellerReviewSummary = $sellerId === null
+            ? ['total' => 0, 'average' => 0.0]
+            : Review::summaryForSeller($sellerId);
+        $bestOffer = Offer::highestPendingForListing((int) $listing->getKey());
+        $reportReasons = Report::reasons();
+
+        return view($this->themes->view('listing', 'show'), compact(
+            'listing',
+            'sellerId',
+            'sellerReviewSummary',
+            'bestOffer',
+            'reportReasons',
+            'isListingFavorited',
+            'isSellerFavorited',
+            'presentableCustomFields',
+            'detailConversation',
+            'gallery',
+            'listingVideos',
+            'relatedListings',
+            'themePillCategories',
+            'breadcrumbCategories',
+        ));
+    }
+
+    public function contact(Listing $listing): JsonResponse
+    {
+        abort_unless($listing->canRevealContactTo(auth()->user()), 403);
+
+        return response()->json($listing->contactDetails());
+    }
+
+    private function positiveInteger(string $key): ?int
+    {
+        $value = request()->integer($key);
+
+        return $value > 0 ? $value : null;
+    }
+
+    private function oneOf(string $key, array $allowed): string
+    {
+        $value = (string) request($key, $allowed[0]);
+
+        return in_array($value, $allowed, true) ? $value : $allowed[0];
+    }
+}

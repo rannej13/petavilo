@@ -1,0 +1,11 @@
+{
+    "name": "Directory",
+    "alias": "directory",
+    "description": "Cat business directory with claims and membership tiers.",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Directory\\Providers\\DirectoryServiceProvider"
+    ],
+    "files": []
+}

@@ -1,0 +1,11 @@
+{
+    "name": "Billing",
+    "alias": "billing",
+    "description": "Stripe checkout for promotions and memberships.",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Billing\\Providers\\BillingServiceProvider"
+    ],
+    "files": []
+}

@@ -1,0 +1,56 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\CatMarket\Settings;
+
+use Spatie\LaravelSettings\Settings;
+
+class MonetisationSettings extends Settings
+{
+    public ?string $stripe_key;
+
+    public ?string $stripe_secret;
+
+    public ?string $stripe_webhook_secret;
+
+    public ?string $stripe_price_breeder;
+
+    public ?string $stripe_price_breeder_usd;
+
+    public ?string $stripe_price_directory_plus;
+
+    public ?string $stripe_price_directory_plus_usd;
+
+    public ?string $stripe_price_directory_premium;
+
+    public ?string $stripe_price_directory_premium_usd;
+
+    public ?string $adsense_client;
+
+    public ?string $adsense_slot_home;
+
+    public ?string $adsense_slot_listing_infeed;
+
+    public ?string $adsense_slot_listing_detail;
+
+    public ?string $adsense_slot_guide_top;
+
+    public ?string $adsense_slot_guide_bottom;
+
+    public ?string $adsense_slot_directory;
+
+    public ?string $amazon_tag_uk;
+
+    public ?string $amazon_tag_us;
+
+    public static function group(): string
+    {
+        return 'monetisation';
+    }
+
+    public static function encrypted(): array
+    {
+        return ['stripe_secret', 'stripe_webhook_secret'];
+    }
+}

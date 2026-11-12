@@ -1,0 +1,11 @@
+{
+    "name": "Ads",
+    "alias": "ads",
+    "description": "Google AdSense slots, ads.txt and affiliate disclosure.",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Ads\\Providers\\AdsServiceProvider"
+    ],
+    "files": []
+}

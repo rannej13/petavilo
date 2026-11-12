@@ -1,0 +1,128 @@
+name: catmarket
+
+x-app: &app
+  image: catmarket-app:latest
+  env_file: .env
+  restart: unless-stopped
+  volumes:
+    - storage:/var/www/html/storage/app
+    - logs:/var/www/html/storage/logs
+  depends_on:
+    db:
+      condition: service_healthy
+    redis:
+      condition: service_started
+
+services:
+  app:
+    <<: *app
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      args:
+        VITE_APP_NAME: ${SITE_NAME:-Cat Marketplace}
+    environment:
+      CONTAINER_ROLE: web
+
+  worker:
+    <<: *app
+    environment:
+      CONTAINER_ROLE: worker
+    depends_on:
+      app:
+        condition: service_started
+
+  scheduler:
+    <<: *app
+    environment:
+      CONTAINER_ROLE: scheduler
+    depends_on:
+      app:
+        condition: service_started
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./backups:/backups
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis:/data
+
+  forum-db:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: flarum
+      MARIADB_USER: flarum
+      MARIADB_PASSWORD: ${FORUM_DB_PASSWORD}
+      MARIADB_RANDOM_ROOT_PASSWORD: "yes"
+    volumes:
+      - forum_db:/var/lib/mysql
+
+  forum:
+    image: mondedie/flarum:stable
+    restart: unless-stopped
+    environment:
+      FORUM_URL: ${FORUM_URL}
+      DB_HOST: forum-db
+      DB_NAME: flarum
+      DB_USER: flarum
+      DB_PASS: ${FORUM_DB_PASSWORD}
+      DB_PREF: flarum_
+      FLARUM_ADMIN_USER: ${FORUM_ADMIN_USER:-admin}
+      FLARUM_ADMIN_PASS: ${FORUM_ADMIN_PASSWORD}
+      FLARUM_ADMIN_MAIL: ${ADMIN_EMAIL}
+      FLARUM_TITLE: ${SITE_NAME} Community
+    volumes:
+      - forum_assets:/flarum/app/public/assets
+      - forum_extensions:/flarum/app/extensions
+      - forum_storage:/flarum/app/storage
+    depends_on:
+      - forum-db
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+      - "8081:8081"
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+      REDIRECT_ADDRESS: ${REDIRECT_ADDRESS:-http://redirect.invalid}
+      PRIMARY_HOST: ${PRIMARY_HOST:-localhost}
+      FORUM_ADDRESS: ${FORUM_ADDRESS:-:8081}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+      - forum
+
+volumes:
+  db:
+  redis:
+  storage:
+  logs:
+  caddy_data:
+  caddy_config:
+  forum_db:
+  forum_assets:
+  forum_extensions:
+  forum_storage:

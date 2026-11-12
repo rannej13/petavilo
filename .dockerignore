@@ -1,0 +1,12 @@
+.git
+.env
+deploy/.env
+deploy/backups
+node_modules
+vendor
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+public/build
+public/hot

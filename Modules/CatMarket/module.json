@@ -1,0 +1,11 @@
+{
+    "name": "CatMarket",
+    "alias": "catmarket",
+    "description": "Cat categories, welfare rules, animal advert review and UK setup.",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\CatMarket\\Providers\\CatMarketServiceProvider"
+    ],
+    "files": []
+}
