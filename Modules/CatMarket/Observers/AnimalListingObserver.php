@@ -35,7 +35,16 @@ final class AnimalListingObserver
             throw ValidationException::withMessages(self::prefixed($errors));
         }
 
+        \Modules\CatMarket\Support\SpamSignals::guardRate($listing);
+        $spam = $contentChanged && ! (bool) $listing->getAttribute('is_example')
+            ? \Modules\CatMarket\Support\SpamSignals::reasons($listing)
+            : [];
+
         if (! WelfareRules::isAnimalCategory($categoryId) && $errors === []) {
+            if ($spam !== []) {
+                self::$queuedReasons[spl_object_id($listing)] = array_values(array_unique($spam));
+            }
+
             return;
         }
 
@@ -51,6 +60,7 @@ final class AnimalListingObserver
         $reasons = [
             ...array_values($errors),
             ...WelfareRules::holdReasons($categoryId, $values, $title, $description),
+            ...$spam,
         ];
 
         if ($premoderate) {

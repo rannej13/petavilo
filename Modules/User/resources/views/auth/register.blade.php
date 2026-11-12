@@ -7,6 +7,7 @@
 @section('auth_body')
 <form method="POST" action="{{ route('register') }}" class="stack">
     @csrf
+    {{ \App\Support\SpamGuard::fields() }}
 
     <div class="field">
         <label class="field__label" for="name">{{ __('user::messages.name') }}</label>

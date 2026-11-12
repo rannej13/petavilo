@@ -42,4 +42,10 @@ return [
     'map_title' => 'Approximate area',
     'map_note' => 'The map shows the rough area only, never the exact address.',
     'map_open' => 'Open larger map',
+    'spam_rate' => 'You have posted a lot of adverts in the last hour. Please wait a little before posting more.',
+    'spam_link' => 'Contains a web link',
+    'spam_contact' => 'Asks buyers to contact or pay off the site (phone, email, WhatsApp, gift cards or crypto)',
+    'spam_duplicate' => 'Same description as another advert from the last 30 days',
+    'spam_new_account' => 'New account posting a lot: :count adverts in its first day',
+    'spam_cheap' => 'Pedigree cat priced very low, a common scam sign',
 ];

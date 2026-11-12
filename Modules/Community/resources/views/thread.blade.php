@@ -49,6 +49,7 @@
         @elseauth
             <form method="POST" action="{{ route('community.reply', $thread->getKey()) }}" class="card" id="reply">
                 @csrf
+            {{ \App\Support\SpamGuard::fields() }}
                 <div class="card__body stack">
                     <div class="field">
                         <label class="field__label" for="reply-body">{{ __('community::messages.reply') }}</label>

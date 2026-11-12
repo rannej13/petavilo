@@ -82,6 +82,7 @@ class CommunityController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        \App\Support\SpamGuard::check($request, 'body');
         $data = $request->validate([
             'board_id' => ['required', 'integer', 'exists:community_boards,id'],
             'title' => ['required', 'string', 'min:6', 'max:160'],
@@ -104,6 +105,7 @@ class CommunityController extends Controller
             return back()->with('error', __('community::messages.locked'));
         }
 
+        \App\Support\SpamGuard::check($request, 'body');
         $data = $request->validate(['body' => ['required', 'string', 'min:2', 'max:10000']]);
 
         $reply = Reply::query()->create([

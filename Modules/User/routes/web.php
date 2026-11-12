@@ -21,7 +21,7 @@ Route::middleware('web')->group(function (): void {
 
     Route::middleware('guest')->group(function (): void {
         Route::get('/register', [RegisterController::class, 'create'])->name('register');
-        Route::post('/register', [RegisterController::class, 'store']);
+        Route::post('/register', [RegisterController::class, 'store'])->middleware('throttle:5,10');
 
         Route::get('/login', [LoginController::class, 'create'])->name('login');
         Route::post('/login', [LoginController::class, 'store']);

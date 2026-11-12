@@ -12,6 +12,7 @@
 
         <form method="POST" action="{{ route('community.store') }}" class="card">
             @csrf
+            {{ \App\Support\SpamGuard::fields() }}
             <div class="card__body stack">
                 <div class="field">
                     <label class="field__label" for="t-board">{{ __('community::messages.board') }}</label>

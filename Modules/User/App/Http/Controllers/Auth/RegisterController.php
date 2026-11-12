@@ -34,6 +34,7 @@ class RegisterController extends Controller
 
     public function store(RegisterRequest $request): RedirectResponse
     {
+        \App\Support\SpamGuard::check($request);
         $this->redirector->rememberInputTarget($request);
 
         $user = User::registerFrom([
