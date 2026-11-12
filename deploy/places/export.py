@@ -1,5 +1,6 @@
 import csv
 import os
+import shutil
 import sys
 import time
 
@@ -76,7 +77,7 @@ def main():
     print("Overture release", release)
 
     categories = ",".join("'" + c + "'" for c in CATEGORIES)
-    tmp = OUT_FILE + ".tmp"
+    tmp = "/tmp/places.csv"
     rows_written = 0
 
     with open(tmp, "w", newline="") as handle:
@@ -123,7 +124,9 @@ def main():
                 """).fetchall()
                 print("no matches; pet-related categories in this release:", hints)
 
-    os.replace(tmp, OUT_FILE)
+    os.makedirs(OUT_DIR, exist_ok=True)
+    shutil.copyfile(tmp, OUT_FILE + ".part")
+    os.replace(OUT_FILE + ".part", OUT_FILE)
     print("wrote", rows_written, "places to", OUT_FILE)
 
 
