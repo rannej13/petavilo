@@ -12,7 +12,6 @@ class ReportServiceProvider extends ServiceProvider
     {
         $this->loadMigrationsFrom(module_path('Report', 'Database/migrations'));
         $this->loadRoutesFrom(module_path('Report', 'routes/web.php'));
-        $this->loadViewsFrom(module_path('Report', 'resources/views'), 'report');
         $this->loadTranslationsFrom(module_path('Report', 'lang'), 'report');
     }
 

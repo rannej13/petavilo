@@ -12,7 +12,6 @@ class ReviewServiceProvider extends ServiceProvider
     {
         $this->loadMigrationsFrom(module_path('Review', 'Database/migrations'));
         $this->loadRoutesFrom(module_path('Review', 'routes/web.php'));
-        $this->loadViewsFrom(module_path('Review', 'resources/views'), 'review');
         $this->loadTranslationsFrom(module_path('Review', 'lang'), 'review');
     }
 
