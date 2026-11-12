@@ -430,7 +430,20 @@ class Listing extends Model implements HasMedia
     {
         return (int) static::query()
             ->active()
+            ->inVisitorRegion()
             ->count();
+    }
+
+    public function scopeInVisitorRegion(Builder $query): Builder
+    {
+        if (app()->runningInConsole() || ! class_exists(\Modules\CatMarket\Support\CatMarketSettings::class)) {
+            return $query;
+        }
+
+        $code = \Modules\CatMarket\Support\CatMarketSettings::visitorCountry();
+        $name = (string) (config('catmarket.countries')[$code]['name'] ?? '');
+
+        return $name === '' ? $query : $query->where('country', $name);
     }
 
     public static function overviewStats(): array
@@ -485,6 +498,7 @@ class Listing extends Model implements HasMedia
     {
         return static::query()->with(['category:id,name', 'media'])
             ->active()
+            ->inVisitorRegion()
             ->where('is_featured', true)
             ->latest()
             ->take($limit)
@@ -495,6 +509,7 @@ class Listing extends Model implements HasMedia
     {
         return static::query()->with(['category:id,name', 'media'])
             ->active()
+            ->inVisitorRegion()
             ->orderByRaw('COALESCE(bumped_at, created_at) DESC')
             ->take($limit)
             ->get();

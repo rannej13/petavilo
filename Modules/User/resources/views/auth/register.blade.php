@@ -24,15 +24,10 @@
     </div>
 
     <div class="field">
-        <label class="field__label" for="phone">{{ __('user::messages.phone') }}</label>
-        <input id="phone" type="tel" name="phone" value="{{ old('phone') }}" class="input" autocomplete="tel">
-        @error('phone')<p class="field__error">{{ $message }}</p>@enderror
-    </div>
-
-    <div class="field">
         <label class="field__label" for="password">{{ __('user::messages.password') }}</label>
         <input id="password" type="password" name="password" class="input" required autocomplete="new-password"
                aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}">
+        <p class="field__hint">At least 8 characters.</p>
         @error('password')<p class="field__error">{{ $message }}</p>@enderror
     </div>
 
@@ -40,6 +35,19 @@
         <label class="field__label" for="password_confirmation">{{ __('user::messages.confirm_password') }}</label>
         <input id="password_confirmation" type="password" name="password_confirmation" class="input" required autocomplete="new-password">
     </div>
+
+    <div class="field">
+        <label class="row" style="align-items:flex-start;gap:var(--space-2)">
+            <input type="checkbox" name="terms" value="1" required @checked(old('terms'))>
+            <span>I agree to the <a href="{{ route('pages.show', 'terms') }}" class="text-link" target="_blank">terms</a> and <a href="{{ route('pages.show', 'privacy') }}" class="text-link" target="_blank">privacy policy</a>, and I am 18 or over.</span>
+        </label>
+        @error('terms')<p class="field__error">{{ $message }}</p>@enderror
+    </div>
+
+    <label class="row" style="align-items:flex-start;gap:var(--space-2)">
+        <input type="checkbox" name="marketing_opt_in" value="1" @checked(old('marketing_opt_in'))>
+        <span class="text-meta">Send me occasional emails about new features and cat care tips (optional).</span>
+    </label>
 
     <button type="submit" class="button button--primary button--block button--large">{{ __('site::messages.register') }}</button>
 

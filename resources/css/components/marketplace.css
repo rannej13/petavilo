@@ -407,3 +407,27 @@
     color: rgb(178 66 0);
     font-weight: 700;
 }
+
+.region-switch {
+    display: inline-flex;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.85);
+    margin-top: var(--space-3, 0.75rem);
+    width: fit-content;
+}
+
+.region-switch__item {
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #333;
+    text-decoration: none;
+}
+
+.region-switch__item.is-active {
+    background: #1f1f1f;
+    color: #fff;
+}

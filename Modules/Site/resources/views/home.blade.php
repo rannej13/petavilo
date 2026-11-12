@@ -10,6 +10,11 @@
         <div class="hero__inner">
             <h1 class="title-hero hero__title">{{ __('site::messages.hero_title') }}</h1>
             <p class="text-lead hero__lead">{{ __('site::messages.hero_lead') }}</p>
+            @php $region = \Modules\CatMarket\Support\CatMarketSettings::visitorCountry(); @endphp
+            <div class="region-switch" role="group" aria-label="Region">
+                <a href="{{ request()->fullUrlWithQuery(['region' => 'GB']) }}" class="region-switch__item {{ $region === 'GB' ? 'is-active' : '' }}">🇬🇧 UK</a>
+                <a href="{{ request()->fullUrlWithQuery(['region' => 'US']) }}" class="region-switch__item {{ $region === 'US' ? 'is-active' : '' }}">🇺🇸 US</a>
+            </div>
 
             <form action="{{ route('listings.index') }}" method="GET" class="hero__search" role="search">
                 <div class="hero__search-row">

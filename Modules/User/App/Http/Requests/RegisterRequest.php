@@ -19,17 +19,37 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name' => ['required', 'string', 'max:120'],
-            'last_name' => ['required', 'string', 'max:120'],
+            'name' => ['required', 'string', 'max:120'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique((new User)->getTable(), 'email')],
-            'password' => ['required', Password::defaults()],
+            'password' => ['required', 'confirmed', Password::defaults()],
             'terms' => ['accepted'],
             'marketing_opt_in' => ['nullable', 'boolean'],
         ];
     }
 
+    protected function prepareForValidation(): void
+    {
+        $name = trim((string) $this->input('name', ''));
+
+        if ($name === '') {
+            $name = trim($this->string('first_name')->toString().' '.$this->string('last_name')->toString());
+        }
+
+        $this->merge([
+            'name' => preg_replace('/\s+/', ' ', $name),
+            'email' => strtolower(trim((string) $this->input('email', ''))),
+        ]);
+    }
+
+    public function messages(): array
+    {
+        return [
+            'terms.accepted' => 'Please tick the box to agree to the terms and privacy policy.',
+        ];
+    }
+
     public function fullName(): string
     {
-        return trim($this->string('first_name')->toString().' '.$this->string('last_name')->toString());
+        return $this->string('name')->toString();
     }
 }
