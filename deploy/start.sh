@@ -25,7 +25,9 @@ php artisan migrate --path=database/settings --force
 php artisan catmarket:install
 php artisan catmarket:images || true
 php artisan storage:link || true
-php artisan optimize
+php artisan config:cache || true
+php artisan route:cache || true
+php artisan event:cache || true
 
 php-fpm -D
 exec nginx -g 'daemon off;'
