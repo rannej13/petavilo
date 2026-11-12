@@ -25,6 +25,7 @@ class InstallCommand extends Command
             $this->call('db:seed', ['--class' => AdminUserSeeder::class, '--force' => true]);
             $this->call('db:seed', ['--class' => \Modules\CatMarket\Database\Seeders\CatPageSeeder::class, '--force' => true]);
             $this->call('db:seed', ['--class' => \Modules\CatMarket\Database\Seeders\ExampleListingSeeder::class, '--force' => true]);
+            $this->call('db:seed', ['--class' => \Modules\Community\Database\Seeders\CommunitySeeder::class, '--force' => true]);
             $this->info('Already installed. Admin user checked.');
 
             return self::SUCCESS;

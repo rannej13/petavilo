@@ -82,10 +82,9 @@ To change this, set in `.env` and recreate the containers:
 - `WELFARE_ENFORCE_RULES=true` refuses adverts that break a rule (for example kittens leaving before 8 weeks).
 - `WELFARE_PREMODERATE=true` holds every cat and kitten advert until you mark it as checked.
 
-## Forum
+## Community
 
-A Flarum forum runs alongside the site: at `http://SERVER_IP:8081` before the domain is set, then `https://community.yourdomain`.
-The forum admin username is `admin`; the password is `FORUM_ADMIN_PASSWORD` in `.env`.
+The community forum is built into the site at `/community`, using the same accounts. Manage boards, threads and replies in Admin → Community. Reported posts show in Admin → Community → Replies (filter: Reported).
 
 ## Company details
 

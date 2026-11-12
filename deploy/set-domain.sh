@@ -37,12 +37,9 @@ set_env REDIRECT_ADDRESS "www.$DOMAIN"
 set_env PRIMARY_HOST "$DOMAIN"
 set_env APP_URL "https://$DOMAIN"
 set_env SESSION_SECURE_COOKIE true
-set_env FORUM_ADDRESS "community.$DOMAIN"
-set_env FORUM_URL "https://community.$DOMAIN"
 
-docker compose up -d --force-recreate app worker scheduler forum caddy
-docker compose exec -T forum sh -c "php /flarum/app/flarum cache:clear" >/dev/null 2>&1 || true
+docker compose up -d --remove-orphans --force-recreate app worker scheduler caddy
 
 echo "Done. https://$DOMAIN will be live in about a minute (Caddy is getting the SSL certificate)."
-echo "Forum: https://community.$DOMAIN (add an A record for community.$DOMAIN too)"
+echo "Community: https://$DOMAIN/community"
 echo "In Stripe, set the webhook URL to https://$DOMAIN/stripe/webhook"

@@ -27,3 +27,26 @@
         </a>
     </div>
 </section>
+@if(\Illuminate\Support\Facades\Route::has('community.index') && \Illuminate\Support\Facades\Schema::hasTable('community_threads'))
+    @php
+        $communityLatest = \Modules\Community\Models\Thread::query()->visible()->with(['board', 'user'])->latest('last_post_at')->limit(5)->get();
+    @endphp
+    @if($communityLatest->isNotEmpty())
+        <section class="section">
+            <div class="stack">
+                <div class="forum-hero">
+                    <div class="stack stack--tight">
+                        <p class="text-eyebrow">{{ __('community::messages.community') }}</p>
+                        <h2 class="title-section">{{ __('community::messages.latest') }}</h2>
+                    </div>
+                    <a href="{{ route('community.index') }}" class="button button--secondary">{{ __('community::messages.boards') }}</a>
+                </div>
+                <div class="card forum-list">
+                    @foreach($communityLatest as $thread)
+                        @include('community::partials.thread-row', ['thread' => $thread, 'showBoard' => true])
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
+@endif

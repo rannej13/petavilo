@@ -13,8 +13,3 @@
 {$REDIRECT_ADDRESS:http://redirect.invalid} {
 	redir https://{$PRIMARY_HOST:localhost}{uri} permanent
 }
-
-{$FORUM_ADDRESS::8081} {
-	encode zstd gzip
-	reverse_proxy forum:8888
-}

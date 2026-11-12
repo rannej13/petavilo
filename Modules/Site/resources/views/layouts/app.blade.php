@@ -221,8 +221,8 @@
                     @if(\Illuminate\Support\Facades\Route::has('guides.index'))
                         <a href="{{ route('guides.index') }}" class="nav-list__item"><span>{{ __('catmarket::messages.guides') }}</span><x-ui.icon name="chevron-right"/></a>
                     @endif
-                    @if(filled(config('catmarket.forum_url')))
-                        <a href="{{ config('catmarket.forum_url') }}" class="nav-list__item"><span>{{ __('catmarket::messages.community') }}</span><x-ui.icon name="chevron-right"/></a>
+                    @if(\Illuminate\Support\Facades\Route::has('community.index'))
+                        <a href="{{ route('community.index') }}" class="nav-list__item"><span>{{ __('catmarket::messages.community') }}</span><x-ui.icon name="chevron-right"/></a>
                     @endif
                 </div>
             </div>
@@ -303,8 +303,8 @@
                 @if(\Illuminate\Support\Facades\Route::has('guides.index'))
                     <a href="{{ route('guides.index') }}" class="site-footer__link">{{ __('catmarket::messages.guides') }}</a>
                 @endif
-                @if(filled(config('catmarket.forum_url')))
-                    <a href="{{ config('catmarket.forum_url') }}" class="site-footer__link">{{ __('catmarket::messages.community') }}</a>
+                @if(\Illuminate\Support\Facades\Route::has('community.index'))
+                    <a href="{{ route('community.index') }}" class="site-footer__link">{{ __('catmarket::messages.community') }}</a>
                 @endif
                 @foreach($helpPages as $helpPage)
                     <a href="{{ route('pages.show', $helpPage->getAttribute('slug')) }}" class="site-footer__link">{{ $helpPage->getAttribute('title') }}</a>

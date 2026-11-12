@@ -21,5 +21,6 @@
     "Ads": true,
     "CatMarket": true,
     "Directory": true,
-    "Guide": true
+    "Guide": true,
+    "Community": true
 }

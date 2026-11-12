@@ -70,38 +70,6 @@ services:
       - ./places:/places:ro
       - storage:/data
 
-  forum-db:
-    image: mariadb:11
-    restart: unless-stopped
-    environment:
-      MARIADB_DATABASE: flarum
-      MARIADB_USER: flarum
-      MARIADB_PASSWORD: ${FORUM_DB_PASSWORD}
-      MARIADB_RANDOM_ROOT_PASSWORD: "yes"
-    volumes:
-      - forum_db:/var/lib/mysql
-
-  forum:
-    image: mondedie/flarum:stable
-    restart: unless-stopped
-    environment:
-      FORUM_URL: ${FORUM_URL}
-      DB_HOST: forum-db
-      DB_NAME: flarum
-      DB_USER: flarum
-      DB_PASS: ${FORUM_DB_PASSWORD}
-      DB_PREF: flarum_
-      FLARUM_ADMIN_USER: ${FORUM_ADMIN_USER:-admin}
-      FLARUM_ADMIN_PASS: ${FORUM_ADMIN_PASSWORD}
-      FLARUM_ADMIN_MAIL: ${ADMIN_EMAIL}
-      FLARUM_TITLE: ${SITE_NAME} Community
-    volumes:
-      - forum_assets:/flarum/app/public/assets
-      - forum_extensions:/flarum/app/extensions
-      - forum_storage:/flarum/app/storage
-    depends_on:
-      - forum-db
-
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
@@ -109,19 +77,16 @@ services:
       - "80:80"
       - "443:443"
       - "443:443/udp"
-      - "8081:8081"
     environment:
       SITE_ADDRESS: ${SITE_ADDRESS:-:80}
       REDIRECT_ADDRESS: ${REDIRECT_ADDRESS:-http://redirect.invalid}
       PRIMARY_HOST: ${PRIMARY_HOST:-localhost}
-      FORUM_ADDRESS: ${FORUM_ADDRESS:-:8081}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
       - app
-      - forum
 
 volumes:
   db:
@@ -130,7 +95,3 @@ volumes:
   logs:
   caddy_data:
   caddy_config:
-  forum_db:
-  forum_assets:
-  forum_extensions:
-  forum_storage:

@@ -1,0 +1,11 @@
+{
+    "name": "Community",
+    "alias": "community",
+    "description": "Built-in community forum using site accounts.",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Community\\Providers\\CommunityServiceProvider"
+    ],
+    "files": []
+}

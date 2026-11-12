@@ -12,6 +12,7 @@ return [
         'guide_top' => env('ADSENSE_SLOT_GUIDE_TOP'),
         'guide_bottom' => env('ADSENSE_SLOT_GUIDE_BOTTOM'),
         'directory' => env('ADSENSE_SLOT_DIRECTORY'),
+        'community' => env('ADSENSE_SLOT_COMMUNITY'),
     ],
     'infeed_slots' => ['listing_infeed'],
     'excluded_routes' => [
@@ -24,5 +25,6 @@ return [
         'favorites.*',
         'directory.claim*',
         'pages.show',
+        'community.create',
     ],
 ];

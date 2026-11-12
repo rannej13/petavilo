@@ -34,7 +34,7 @@ return [
     'privacy_settings' => 'Privacy settings',
     'directory' => 'Cat services directory',
     'guides' => 'Guides',
-    'community' => 'Community forum',
+    'community' => 'Community',
     'yes' => 'Yes',
     'no' => 'No',
     'example_badge' => 'Example',

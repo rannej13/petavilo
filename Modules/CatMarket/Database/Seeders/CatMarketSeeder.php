@@ -29,6 +29,7 @@ class CatMarketSeeder extends Seeder
             GuideSeeder::class,
             DirectorySeeder::class,
             ExampleListingSeeder::class,
+            \Modules\Community\Database\Seeders\CommunitySeeder::class,
         ]);
     }
 }

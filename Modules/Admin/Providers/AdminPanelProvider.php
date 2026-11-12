@@ -25,6 +25,7 @@ use Jeffgreco13\FilamentBreezy\BreezyCore;
 use Modules\CatMarket\CatMarketPlugin;
 use Modules\Category\CategoryPlugin;
 use Modules\Directory\DirectoryPlugin;
+use Modules\Community\CommunityPlugin;
 use Modules\Guide\GuidePlugin;
 use Modules\Demo\App\Http\Middleware\ResolveDemoRequest;
 use Modules\Listing\ListingPlugin;
@@ -93,6 +94,7 @@ class AdminPanelProvider extends PanelProvider
                 CatMarketPlugin::make(),
                 DirectoryPlugin::make(),
                 GuidePlugin::make(),
+                CommunityPlugin::make(),
             ])
             ->pages([Dashboard::class])
             ->middleware([
