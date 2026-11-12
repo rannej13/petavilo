@@ -14,6 +14,7 @@ use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
 use Modules\Category\Models\Category;
 use Modules\CatMarket\Support\CatMarketSettings;
+use Modules\CatMarket\Support\TitleCategorySuggester;
 use Modules\CatMarket\Support\WelfareRules;
 use Modules\Listing\Models\Listing;
 use Modules\Listing\Models\ListingCustomField;
@@ -279,6 +280,28 @@ class PanelQuickListingForm extends Component
         $this->redirectRoute('panel.listings.index');
     }
 
+    public function getTitleSuggestionsProperty(): array
+    {
+        if (! class_exists(TitleCategorySuggester::class)) {
+            return [];
+        }
+
+        $slugs = TitleCategorySuggester::suggest($this->listingTitle);
+
+        if ($slugs === []) {
+            return [];
+        }
+
+        $ids = Category::idsForSlugs($slugs);
+
+        return collect($slugs)
+            ->map(fn (string $slug): ?int => $ids[$slug] ?? null)
+            ->filter(fn (?int $id): bool => $id !== null && $this->categoryExists($id))
+            ->map(fn (int $id): array => ['id' => $id, 'path' => implode(' › ', $this->categoryPathParts($id))])
+            ->values()
+            ->all();
+    }
+
     public function getRootCategoriesProperty(): array
     {
         return collect($this->categories)
@@ -334,7 +357,7 @@ class PanelQuickListingForm extends Component
     public function getCurrentStepTitleProperty(): string
     {
         return match ($this->currentStep) {
-            1 => 'Category',
+            1 => 'What are you posting?',
             2 => 'Details',
             3 => 'Photos',
             4 => 'Review',
@@ -345,7 +368,7 @@ class PanelQuickListingForm extends Component
     public function getCurrentStepHintProperty(): string
     {
         return match ($this->currentStep) {
-            1 => 'Pick the right category.',
+            1 => 'Type a short title, then pick one of the suggested categories.',
             2 => 'Describe your cat, item or service.',
             3 => 'Add photos if you have them. You can skip this step.',
             4 => 'Check everything before publishing.',
@@ -452,12 +475,14 @@ class PanelQuickListingForm extends Component
     private function validateCategoryStep(): void
     {
         $this->validate([
+            'listingTitle' => ['required', 'string', 'max:70'],
             'selectedCategoryId' => [
                 'required',
                 'integer',
                 Rule::in(collect($this->categories)->pluck('id')->all()),
             ],
         ], [
+            'listingTitle.required' => 'Please give your advert a title.',
             'selectedCategoryId.required' => 'Please choose a category.',
             'selectedCategoryId.in' => 'Please choose a valid category.',
         ]);
@@ -727,12 +752,11 @@ class PanelQuickListingForm extends Component
     {
         $normalizedKeys = collect($keys)->map(fn (int|string $key): string => (string) $key)->values();
 
-        if ($normalizedKeys->contains('selectedCategoryId')) {
+        if ($normalizedKeys->contains('selectedCategoryId') || $normalizedKeys->contains('listingTitle')) {
             return 1;
         }
 
         if ($normalizedKeys->contains(fn (int|string $key): mixed => in_array($key, [
-            'listingTitle',
             'price',
             'description',
             'selectedCountryId',

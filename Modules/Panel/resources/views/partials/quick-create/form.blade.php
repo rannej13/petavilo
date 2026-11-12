@@ -1,6 +1,6 @@
 @php
     $steps = [
-        1 => __('site::messages.category'),
+        1 => 'Title & category',
         2 => __('site::messages.details'),
         3 => __('panel::messages.photos'),
         4 => __('panel::messages.overview'),
@@ -103,6 +103,39 @@
                     </div>
                 @elseif($currentStep === 1)
                     <div class="stack">
+                        <div class="field">
+                            <label class="field__label" for="listing-title">{{ __('panel::messages.title') }}</label>
+                            <input id="listing-title" type="text" class="input" wire:model.live.debounce.400ms="listingTitle" maxlength="70" placeholder="e.g. Ragdoll kittens ready now, or Large cat tree" autofocus>
+                            <p class="text-muted">Keep it short and say what it is. Buyers see this first.</p>
+                            @error('listingTitle')<p class="field__error">{{ $message }}</p>@enderror
+                        </div>
+
+                        @if($this->titleSuggestions !== [])
+                            <div class="stack stack--tight">
+                                <p class="field__label">Suggested categories</p>
+                                <div class="nav-list">
+                                    @foreach($this->titleSuggestions as $suggestion)
+                                        <button
+                                            type="button"
+                                            class="nav-list__item {{ $selectedCategoryId === $suggestion['id'] ? 'is-active' : '' }}"
+                                            wire:click="selectCategory({{ $suggestion['id'] }})"
+                                        >
+                                            <span>{{ $suggestion['path'] }}</span>
+                                            @if($selectedCategoryId === $suggestion['id'])
+                                                <x-ui.icon name="check"/>
+                                            @endif
+                                        </button>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+
+                        @if($selectedCategoryId)
+                            <p class="text-muted">Category: <strong>{{ $this->selectedCategoryPath }}</strong></p>
+                        @endif
+
+                        <p class="field__label">{{ $this->titleSuggestions !== [] ? 'Not right? Choose it yourself' : 'Choose a category' }}</p>
+
                         @if($detectedError)
                             <div class="alert alert--caution"><x-ui.icon name="sparkle"/><span>{{ $detectedError }}</span></div>
                         @elseif($detectedCategoryId)
@@ -157,10 +190,9 @@
                     </div>
                 @elseif($currentStep === 2)
                     <div class="stack">
-                        <div class="field">
-                            <label class="field__label" for="listing-title">{{ __('panel::messages.title') }}</label>
-                            <input id="listing-title" type="text" class="input" wire:model.blur="listingTitle" maxlength="150">
-                            @error('listingTitle')<p class="field__error">{{ $message }}</p>@enderror
+                        <div class="row row--between">
+                            <span class="text-muted">{{ $listingTitle }} · {{ $this->selectedCategoryPath }}</span>
+                            <button type="button" class="button button--ghost button--small" wire:click="goToCategoryStep">Change</button>
                         </div>
 
                         <div class="field">
@@ -284,7 +316,7 @@
                     @endif
 
                     @if($currentStep === 1)
-                        <button type="button" class="button button--primary" wire:click="goToDetailsStep">{{ __('site::messages.apply') }}</button>
+                        <button type="button" class="button button--primary" wire:click="goToDetailsStep">Continue</button>
                     @elseif($currentStep === 2)
                         <button type="button" class="button button--primary" wire:click="goToPhotosStep">{{ __('site::messages.apply') }}</button>
                     @elseif($currentStep === 3)

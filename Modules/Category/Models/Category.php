@@ -171,6 +171,16 @@ class Category extends Model
             ->get(['id', 'name', 'parent_id']);
     }
 
+    public static function idsForSlugs(array $slugs): array
+    {
+        return static::query()
+            ->active()
+            ->whereIn('slug', $slugs)
+            ->pluck('id', 'slug')
+            ->map(fn (mixed $id): int => (int) $id)
+            ->all();
+    }
+
     public static function panelQuickCatalog(): array
     {
         $all = static::query()
