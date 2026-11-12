@@ -73,6 +73,9 @@
                     <div class="data-row__actions">
                         <a href="{{ route('listings.show', $listing) }}" class="button button--ghost button--small">{{ __('panel::messages.view') }}</a>
                         <a href="{{ route('panel.listings.edit', $listing) }}" class="button button--secondary button--small">{{ __('panel::messages.edit') }}</a>
+                        @if(Route::has('panel.promotions.index') && in_array($listing->statusValue(), ['active', 'pending'], true))
+                            <a href="{{ route('panel.promotions.index', ['listing' => $listing->getKey()]) }}" class="button button--ghost button--small">Bump or feature</a>
+                        @endif
 
                         @if($listing->statusValue() !== 'sold')
                             <form method="POST" action="{{ route('panel.listings.mark-sold', $listing) }}">

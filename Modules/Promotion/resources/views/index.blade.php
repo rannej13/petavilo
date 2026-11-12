@@ -27,7 +27,7 @@
                 <label class="field__label" for="promotion-listing">{{ __('promotion::messages.select_listing') }}</label>
                 <select id="promotion-listing" name="listing_id" class="select" required>
                     @foreach($listingOptions as $id => $title)
-                        <option value="{{ $id }}">{{ $title }}</option>
+                        <option value="{{ $id }}" @selected((int) request('listing') === (int) $id)>{{ $title }}</option>
                     @endforeach
                 </select>
             </div>

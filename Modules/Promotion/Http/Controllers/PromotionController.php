@@ -47,13 +47,22 @@ class PromotionController extends Controller
             'plan' => ['required', 'string', 'max:64'],
         ]);
 
-        $plan = PromotionPlan::findActiveBySlug((string) $validated['plan']);
+        return $this->promote($request, (int) $validated['listing_id'], (string) $validated['plan']);
+    }
+
+    public function start(Request $request, int $listing, string $plan): RedirectResponse|Checkout
+    {
+        return $this->promote($request, $listing, $plan);
+    }
+
+    private function promote(Request $request, int $listingId, string $planSlug): RedirectResponse|Checkout
+    {
+        $plan = PromotionPlan::findActiveBySlug($planSlug);
 
         if ($plan === null) {
             abort(404);
         }
 
-        $listingId = (int) $validated['listing_id'];
         $userId = (int) $request->user()->getKey();
 
         abort_unless(ListingDirectory::sellerIdFor($listingId) === $userId, 403);
@@ -66,7 +75,7 @@ class PromotionController extends Controller
             } elseif (PaymentGateway::isConfigured()) {
                 return PaymentGateway::promotionCheckout($request->user(), $plan, $listingId);
             } else {
-                return back()->with('error', __('billing::messages.payments_unavailable'));
+                return redirect()->route('panel.promotions.index')->with('error', __('billing::messages.payments_unavailable'));
             }
         }
 

@@ -11,5 +11,6 @@ Route::middleware('web')->group(function (): void {
     Route::middleware('auth')->prefix('panel')->name('panel.promotions.')->group(function (): void {
         Route::get('/promotions', [PromotionController::class, 'index'])->name('index');
         Route::post('/promotions', [PromotionController::class, 'store'])->name('store');
+        Route::get('/promotions/start/{listing}/{plan}', [PromotionController::class, 'start'])->whereNumber('listing')->name('start');
     });
 });

@@ -21,6 +21,7 @@ use Modules\Listing\Models\ListingCustomField;
 use Modules\Listing\Support\ListingPanelHelper;
 use Modules\Listing\Support\QuickListingCategorySuggester;
 use Modules\Location\Models\City;
+use Modules\Promotion\Models\PromotionPlan;
 use Modules\Location\Models\Country;
 use Modules\Site\App\Support\LocalMedia;
 use Modules\User\App\Models\Profile;
@@ -86,6 +87,8 @@ class PanelQuickListingForm extends Component
     public bool $shouldPersistDraft = true;
 
     public ?string $publishError = null;
+
+    public string $promotionPlan = '';
 
     public function mount(): void
     {
@@ -261,7 +264,8 @@ class PanelQuickListingForm extends Component
         } catch (Throwable $exception) {
             report($exception);
             $this->isPublishing = false;
-            $this->publishError = 'The listing could not be created. Please try again.';
+            $this->publishError = 'The listing could not be created. Please try again.'
+                .(auth()->user()?->hasRole('admin') ? ' ('.class_basename($exception).': '.mb_substr($exception->getMessage(), 0, 300).')' : '');
             session()->flash('error', 'The listing could not be created. Please try again.');
 
             return;
@@ -271,6 +275,14 @@ class PanelQuickListingForm extends Component
         session()->flash('success', 'Your listing has been created successfully.');
         $this->clearDraft();
 
+        $plan = $this->chosenPromotionPlan();
+
+        if ($plan !== null) {
+            $this->redirectRoute('panel.promotions.start', ['listing' => $listing->getKey(), 'plan' => $plan->getAttribute('slug')]);
+
+            return;
+        }
+
         if (Route::has('panel.listings.edit')) {
             $this->redirectRoute('panel.listings.edit', ['listing' => $listing->getKey()]);
 
@@ -278,6 +290,27 @@ class PanelQuickListingForm extends Component
         }
 
         $this->redirectRoute('panel.listings.index');
+    }
+
+    public function getPromotionOptionsProperty(): array
+    {
+        if (! class_exists(PromotionPlan::class)) {
+            return [];
+        }
+
+        $currency = CatMarketSettings::currencyForCountry($this->selectedCountryName);
+        $symbol = strtoupper($currency) === 'USD' ? '$' : '£';
+
+        return PromotionPlan::catalog()
+            ->filter(fn (PromotionPlan $plan): bool => (float) $plan->getAttribute('price') > 0)
+            ->map(fn (PromotionPlan $plan): array => [
+                'slug' => (string) $plan->getAttribute('slug'),
+                'name' => (string) $plan->getAttribute('name'),
+                'description' => (string) $plan->getAttribute('description'),
+                'price' => $symbol.number_format($plan->priceFor($currency), 2),
+            ])
+            ->values()
+            ->all();
     }
 
     public function getTitleSuggestionsProperty(): array
@@ -722,6 +755,15 @@ class PanelQuickListingForm extends Component
                 $this->selectedCityId = $city['id'];
             }
         }
+    }
+
+    private function chosenPromotionPlan(): ?PromotionPlan
+    {
+        if ($this->promotionPlan === '' || ! class_exists(PromotionPlan::class)) {
+            return null;
+        }
+
+        return PromotionPlan::findActiveBySlug($this->promotionPlan);
     }
 
     private function categoryExists(int $categoryId): bool

@@ -300,6 +300,27 @@
                                 @endforeach
                             </div>
                         @endif
+
+                        @if($this->promotionOptions !== [])
+                            <fieldset class="stack stack--tight">
+                                <legend class="title-card">Make your advert stand out</legend>
+                                <p class="text-muted">Optional. Pick one and you'll pay securely by card after your advert is posted.</p>
+                                <label class="nav-list__item {{ $promotionPlan === '' ? 'is-active' : '' }}">
+                                    <span class="row"><input type="radio" wire:model.live="promotionPlan" value=""> <span>No thanks, post for free</span></span>
+                                </label>
+                                @foreach($this->promotionOptions as $option)
+                                    <label class="nav-list__item {{ $promotionPlan === $option['slug'] ? 'is-active' : '' }}">
+                                        <span class="row">
+                                            <input type="radio" wire:model.live="promotionPlan" value="{{ $option['slug'] }}">
+                                            <span class="stack stack--tight">
+                                                <strong>{{ $option['name'] }} · {{ $option['price'] }}</strong>
+                                                <span class="text-muted">{{ $option['description'] }}</span>
+                                            </span>
+                                        </span>
+                                    </label>
+                                @endforeach
+                            </fieldset>
+                        @endif
                     </div>
                 @endif
             </div>
@@ -323,7 +344,7 @@
                         <button type="button" class="button button--primary" wire:click="goToPreviewStep">{{ $photos === [] ? 'Skip photos' : __('site::messages.apply') }}</button>
                     @else
                         <button type="button" class="button button--primary button--large" wire:click="publishListing" wire:loading.attr="disabled">
-                            <span wire:loading.remove wire:target="publishListing">{{ __('site::messages.post_listing_cta') }}</span>
+                            <span wire:loading.remove wire:target="publishListing">{{ $promotionPlan === '' ? __('site::messages.post_listing_cta') : 'Post and pay' }}</span>
                             <span wire:loading wire:target="publishListing">{{ __('panel::messages.publishing') }}</span>
                         </button>
                     @endif
