@@ -7,6 +7,8 @@ cd /var/www/html
 
 mkdir -p storage/app/private storage/app/public storage/framework/cache storage/framework/sessions storage/framework/views storage/logs
 chown -R www-data:www-data storage
+mkdir -p /tmp/nginx/body /tmp/nginx/fastcgi /tmp/nginx/proxy /tmp/nginx/uwsgi /tmp/nginx/scgi
+chown -R www-data:www-data /tmp/nginx /var/lib/nginx 2>/dev/null || true
 
 if [ "$ROLE" = "worker" ]; then
     exec su www-data -s /bin/sh -c "php artisan queue:work --sleep=3 --tries=3 --max-time=3600"
