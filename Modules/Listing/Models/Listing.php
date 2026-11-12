@@ -849,8 +849,8 @@ class Listing extends Model implements HasMedia
         $payload['currency'] = ListingPanelHelper::normalizeCurrency($data['currency'] ?? null);
         $payload['slug'] = $slug;
 
-        $listing = static::query()->make($payload);
-        $listing->save();
+        $listing = new static();
+        $listing->forceFill($payload)->save();
 
         return $listing;
     }
