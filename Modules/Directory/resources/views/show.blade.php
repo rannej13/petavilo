@@ -71,6 +71,13 @@
             <x-ads::slot name="directory"/>
         @endunless
 
+        @if(! $business->isClaimed() && filled($business->getAttribute('source')))
+            <aside class="notice" role="note">
+                <p>{{ __('directory::messages.data_note') }}</p>
+                <p><a class="text-link" href="mailto:{{ \Modules\CatMarket\Support\CatMarketSettings::contactEmail() }}?subject={{ rawurlencode('Remove listing: '.$business->getAttribute('name').' (#'.$business->getKey().')') }}">{{ __('directory::messages.remove_listing') }}</a></p>
+            </aside>
+        @endif
+
         @unless($business->isClaimed())
             <section class="card">
                 <div class="card__head"><h2 class="card__title">{{ __('directory::messages.claim_title') }}</h2></div>

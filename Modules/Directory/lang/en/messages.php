@@ -48,4 +48,8 @@ return [
     'no_business' => 'You have no business listed yet.',
     'view_page' => 'View page',
     'tier' => 'Plan',
+    'unclaimed' => 'Unclaimed',
+    'unclaimed_hint' => 'Listed from public business data. Details may be out of date.',
+    'remove_listing' => 'Ask us to remove this listing',
+    'data_note' => 'Business details shown here come from public sources (Overture Maps Foundation open data) until the owner claims the listing.',
 ];

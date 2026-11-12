@@ -62,6 +62,14 @@ services:
     volumes:
       - redis:/data
 
+  places:
+    image: python:3.12-slim
+    restart: "no"
+    entrypoint: ["sh", "/places/run.sh"]
+    volumes:
+      - ./places:/places:ro
+      - storage:/data
+
   forum-db:
     image: mariadb:11
     restart: unless-stopped

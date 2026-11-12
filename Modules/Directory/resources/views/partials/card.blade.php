@@ -15,6 +15,7 @@
             {{ \Modules\Directory\Models\Business::typeName((string) $business->getAttribute('type'), true) }}
             @if(filled($business->getAttribute('town'))) · {{ $business->getAttribute('town') }}@endif
             @if($business->getAttribute('is_verified')) · <span class="badge badge--positive">{{ __('directory::messages.verified') }}</span>@endif
+            @if(! $business->isClaimed() && filled($business->getAttribute('source'))) · <span class="badge" title="{{ __('directory::messages.unclaimed_hint') }}">{{ __('directory::messages.unclaimed') }}</span>@endif
         </p>
         @if($business->isPaid() && filled($business->getAttribute('description')))
             <p class="text-clamp-2">{{ $business->getAttribute('description') }}</p>

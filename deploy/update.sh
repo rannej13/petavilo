@@ -7,6 +7,10 @@ docker compose build
 docker compose up -d
 docker image prune -f
 
+if [ ! -f /etc/cron.d/petavilo-places ]; then
+    echo "30 4 2 * * root cd $(pwd) && docker compose run --rm places --force >> /var/log/petavilo-places.log 2>&1" > /etc/cron.d/petavilo-places
+fi
+
 if [ ! -f /etc/cron.d/petavilo-autoupdate ]; then
     echo "*/10 * * * * root bash $(pwd)/auto-update.sh >> /var/log/petavilo-autoupdate.log 2>&1" > /etc/cron.d/petavilo-autoupdate
 fi

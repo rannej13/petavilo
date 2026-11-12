@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Modules\Directory\Providers;
 
 use App\Support\SitemapRegistry;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
+use Modules\Directory\Console\ImportPlacesCommand;
 use Modules\Directory\Models\Business;
 
 class DirectoryServiceProvider extends ServiceProvider
@@ -13,6 +15,10 @@ class DirectoryServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(module_path('Directory', 'config/directory.php'), 'directory');
+
+        $this->callAfterResolving(Schedule::class, static function (Schedule $schedule): void {
+            $schedule->command('directory:import-places')->name('directory:import-places')->hourly()->withoutOverlapping();
+        });
     }
 
     public function boot(): void
@@ -21,6 +27,10 @@ class DirectoryServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(module_path('Directory', 'routes/web.php'));
         $this->loadViewsFrom(module_path('Directory', 'resources/views'), 'directory');
         $this->loadTranslationsFrom(module_path('Directory', 'lang'), 'directory');
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([ImportPlacesCommand::class]);
+        }
 
         SitemapRegistry::register(static fn (): array => [
             ['url' => route('directory.index')],
