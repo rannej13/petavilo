@@ -11,16 +11,37 @@ MAX_AGE_DAYS = 30
 
 CATEGORIES = {
     "veterinarian": "vets",
+    "veterinary_clinic": "vets",
+    "veterinary_hospital": "vets",
     "animal_hospital": "vets",
     "emergency_pet_hospital": "vets",
+    "emergency_veterinarian": "vets",
     "pet_groomer": "groomers",
+    "pet_grooming": "groomers",
     "pet_boarding": "catteries",
     "pet_hotel": "catteries",
+    "cattery": "catteries",
+    "pet_sitting": "cat-sitters",
+    "pet_sitter": "cat-sitters",
     "animal_shelter": "rescues",
     "animal_rescue_service": "rescues",
+    "animal_rescue": "rescues",
+    "pet_adoption": "rescues",
     "pet_store": "pet-shops",
+    "pet_supply_store": "pet-shops",
+    "pet_shop": "pet-shops",
     "pet_transportation": "pet-transport",
+    "pet_transport": "pet-transport",
 }
+
+
+def directory_type(primary, hierarchy):
+    if primary in CATEGORIES:
+        return CATEGORIES[primary]
+    for label in reversed(hierarchy or []):
+        if label in CATEGORIES:
+            return CATEGORIES[label]
+    return ""
 
 REGIONS = {
     "GB": (-8.7, 49.8, 1.9, 60.9),
@@ -65,7 +86,8 @@ def main():
             query = f"""
                 SELECT id,
                        names.primary AS name,
-                       categories.primary AS category,
+                       taxonomy.primary AS category,
+                       taxonomy.hierarchy AS hierarchy,
                        addresses[1].country AS country,
                        addresses[1].locality AS town,
                        addresses[1].region AS region,
@@ -77,16 +99,29 @@ def main():
                 FROM read_parquet('s3://overturemaps-us-west-2/release/{release}/theme=places/type=place/*', hive_partitioning=1)
                 WHERE bbox.xmin BETWEEN {xmin} AND {xmax}
                   AND bbox.ymin BETWEEN {ymin} AND {ymax}
-                  AND categories.primary IN ({categories})
+                  AND (taxonomy.primary IN ({categories}) OR list_has_any(taxonomy.hierarchy, [{categories}]))
                   AND addresses[1].country = '{country}'
                   AND confidence >= 0.6
                   AND coalesce(operating_status, 'open') = 'open'
                   AND names.primary IS NOT NULL
             """
+            before = rows_written
             for row in con.execute(query).fetchall():
-                writer.writerow([row[0], row[1], CATEGORIES.get(row[2], ""), row[3], row[4] or "", row[5] or "", row[6] or "", row[7] or "", row[8] or "", row[9] or "", row[10] or ""])
+                kind = directory_type(row[2], row[3])
+                if not kind:
+                    continue
+                writer.writerow([row[0], row[1], kind, row[4], row[5] or "", row[6] or "", row[7] or "", row[8] or "", row[9] or "", row[10] or "", row[11] or ""])
                 rows_written += 1
-            print(country, "done, total rows", rows_written)
+            print(country, "rows", rows_written - before)
+            if rows_written == before:
+                hints = con.execute(f"""
+                    SELECT taxonomy.primary AS c, count(*) AS n
+                    FROM read_parquet('s3://overturemaps-us-west-2/release/{release}/theme=places/type=place/*', hive_partitioning=1)
+                    WHERE bbox.xmin BETWEEN {xmin} AND {xmax} AND bbox.ymin BETWEEN {ymin} AND {ymax}
+                      AND (taxonomy.primary ILIKE '%pet%' OR taxonomy.primary ILIKE '%vet%' OR taxonomy.primary ILIKE '%animal%')
+                    GROUP BY 1 ORDER BY 2 DESC LIMIT 25
+                """).fetchall()
+                print("no matches; pet-related categories in this release:", hints)
 
     os.replace(tmp, OUT_FILE)
     print("wrote", rows_written, "places to", OUT_FILE)
