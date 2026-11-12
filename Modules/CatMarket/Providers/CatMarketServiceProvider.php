@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\CatMarket\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Modules\CatMarket\Console\ImagesCommand;
 use Modules\CatMarket\Console\InstallCommand;
 use Modules\CatMarket\Http\Middleware\RememberRegion;
 use Modules\CatMarket\Observers\AnimalListingObserver;
@@ -25,7 +26,7 @@ class CatMarketServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom(module_path('CatMarket', 'lang'), 'catmarket');
 
         if ($this->app->runningInConsole()) {
-            $this->commands([InstallCommand::class]);
+            $this->commands([InstallCommand::class, ImagesCommand::class]);
         }
 
         Listing::observe(AnimalListingObserver::class);

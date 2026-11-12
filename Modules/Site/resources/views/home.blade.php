@@ -4,7 +4,8 @@
 @section('description', __('site::messages.tagline'))
 
 @section('content')
-<section class="hero">
+@php $heroImage = \Modules\CatMarket\Support\SiteImages::url('hero'); @endphp
+<section class="hero {{ $heroImage ? 'hero--image' : '' }}" @if($heroImage) style="--hero-image: url('{{ $heroImage }}')" @endif>
     <div class="shell">
         <div class="hero__inner">
             <h1 class="title-hero hero__title">{{ __('site::messages.hero_title') }}</h1>

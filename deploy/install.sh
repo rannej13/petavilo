@@ -93,6 +93,8 @@ echo "==> Building and starting (this takes 5 to 10 minutes the first time)"
 docker compose build
 docker compose up -d
 
+echo "*/10 * * * * root bash $APP_DIR/deploy/auto-update.sh >> /var/log/petavilo-autoupdate.log 2>&1" > /etc/cron.d/petavilo-autoupdate
+
 mkdir -p backups
 cat > /etc/cron.d/catmarket-backup <<CRON
 15 2 * * * root cd $APP_DIR/deploy && docker compose exec -T db sh -c 'pg_dump -U \$POSTGRES_USER \$POSTGRES_DB | gzip > /backups/db-\$(date +\%F).sql.gz' && find $APP_DIR/deploy/backups -name 'db-*.sql.gz' -mtime +14 -delete

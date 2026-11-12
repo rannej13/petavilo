@@ -6,3 +6,7 @@ git -C .. pull --ff-only
 docker compose build
 docker compose up -d
 docker image prune -f
+
+if [ ! -f /etc/cron.d/petavilo-autoupdate ]; then
+    echo "*/10 * * * * root bash $(pwd)/auto-update.sh >> /var/log/petavilo-autoupdate.log 2>&1" > /etc/cron.d/petavilo-autoupdate
+fi

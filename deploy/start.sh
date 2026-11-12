@@ -23,6 +23,7 @@ done
 
 php artisan migrate --path=database/settings --force
 php artisan catmarket:install
+php artisan catmarket:images || true
 php artisan storage:link || true
 php artisan optimize
 
