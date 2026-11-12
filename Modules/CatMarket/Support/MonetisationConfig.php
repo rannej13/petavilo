@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\CatMarket\Support;
 
+use Illuminate\Support\Facades\Schema;
 use Modules\CatMarket\Settings\MonetisationSettings;
 use Throwable;
 
@@ -12,10 +13,19 @@ final class MonetisationConfig
     public static function apply(): void
     {
         try {
-            $settings = app(MonetisationSettings::class);
+            self::applySettings();
         } catch (Throwable) {
             return;
         }
+    }
+
+    private static function applySettings(): void
+    {
+        if (! Schema::hasTable('settings')) {
+            return;
+        }
+
+        $settings = app(MonetisationSettings::class);
 
         $map = [
             'cashier.key' => $settings->stripe_key,
