@@ -5,7 +5,7 @@ declare(strict_types=1);
 return [
     'temporary_file_upload' => [
         'disk' => env('LIVEWIRE_TEMPORARY_FILE_UPLOAD_DISK', 'local'),
-        'rules' => null,
+        'rules' => ['required', 'file', 'max:92160'],
         'directory' => null,
         'middleware' => null,
         'preview_mimes' => [
@@ -13,7 +13,7 @@ return [
             'mov', 'avi', 'wmv', 'mp3', 'm4a',
             'jpg', 'jpeg', 'mpga', 'webp', 'wma',
         ],
-        'max_upload_time' => 5,
+        'max_upload_time' => 15,
         'cleanup' => true,
     ],
 ];

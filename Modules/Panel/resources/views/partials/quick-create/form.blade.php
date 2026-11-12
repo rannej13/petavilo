@@ -80,8 +80,12 @@
                             <label class="upload__control" for="quick-videos">
                                 <x-ui.icon name="video"/>
                                 <span class="title-card">{{ __('panel::messages.videos') }}</span>
+                                <span class="text-muted">Optional. Up to 90 MB each, so short clips of 30 to 60 seconds work best.</span>
                                 <input id="quick-videos" type="file" class="visually-hidden" wire:model="videos" multiple accept="video/*">
                             </label>
+                            <div wire:loading wire:target="videos" class="text-muted">Uploading video, this can take a minute...</div>
+                            @error('videos')<p class="field__error">{{ $message }}</p>@enderror
+                            @error('videos.*')<p class="field__error">{{ $message }}</p>@enderror
 
                             @if($videos !== [])
                                 <ul class="stack stack--tight">

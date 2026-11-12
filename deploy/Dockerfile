@@ -2,7 +2,7 @@ FROM php:8.4-fpm-alpine
 
 COPY --from=mlocati/php-extension-installer:2 /usr/bin/install-php-extensions /usr/local/bin/
 
-RUN apk add --no-cache nginx nodejs npm git curl zip unzip \
+RUN apk add --no-cache nginx nodejs npm git curl zip unzip ffmpeg \
     && install-php-extensions pdo_pgsql pgsql redis gd intl zip bcmath exif pcntl opcache
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
