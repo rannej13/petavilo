@@ -24,6 +24,9 @@
             @if($isFeatured)
                 <span class="badge badge--solid">{{ __('promotion::messages.featured_badge') }}</span>
             @endif
+            @if($listing->usesPlaceholderImage())
+                <span class="badge">Stock photo</span>
+            @endif
             @if((bool) $listing->getAttribute('is_example'))
                 <span class="badge">{{ __('catmarket::messages.example_badge') }}</span>
             @endif

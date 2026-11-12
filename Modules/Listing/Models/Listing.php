@@ -329,7 +329,7 @@ class Listing extends Model implements HasMedia
                 ->all();
         }
 
-        return collect($this->images ?? [])
+        $images = collect($this->images ?? [])
             ->filter(fn (mixed $value): bool => is_string($value) && trim($value) !== '')
             ->map(fn (string $url): array => [
                 'gallery' => ListingImageViewData::fromUrl($url),
@@ -337,6 +337,15 @@ class Listing extends Model implements HasMedia
             ])
             ->values()
             ->all();
+
+        if ($images === [] && ($placeholder = $this->placeholderImageUrl()) !== null) {
+            $images[] = [
+                'gallery' => ListingImageViewData::fromUrl($placeholder),
+                'thumb' => ListingImageViewData::fromUrl($placeholder),
+            ];
+        }
+
+        return $images;
     }
 
     public function primaryImageData(string $context = 'card'): ?array
@@ -350,7 +359,45 @@ class Listing extends Model implements HasMedia
         $fallback = collect($this->images ?? [])
             ->first(fn (mixed $value): bool => is_string($value) && trim($value) !== '');
 
-        return ListingImageViewData::fromUrl(is_string($fallback) ? $fallback : null);
+        return ListingImageViewData::fromUrl(is_string($fallback) ? $fallback : $this->placeholderImageUrl());
+    }
+
+    public function usesPlaceholderImage(): bool
+    {
+        if ($this->relationLoaded('media') ? $this->media->where('collection_name', 'listing-images')->isNotEmpty() : $this->getFirstMedia('listing-images') instanceof Media) {
+            return false;
+        }
+
+        return collect($this->images ?? [])->filter(fn (mixed $value): bool => is_string($value) && trim($value) !== '')->isEmpty();
+    }
+
+    public function placeholderImageUrl(): ?string
+    {
+        static $cache = [];
+
+        if (! class_exists(\Modules\CatMarket\Support\SiteImages::class)) {
+            return null;
+        }
+
+        $categoryId = (int) $this->getAttribute('category_id');
+
+        if (! array_key_exists($categoryId, $cache)) {
+            $slug = '';
+            $category = $categoryId > 0 ? Category::query()->find($categoryId, ['id', 'slug', 'parent_id']) : null;
+            $guard = 0;
+
+            while ($category !== null && $guard < 5) {
+                $slug = (string) $category->getAttribute('slug');
+                $parentId = $category->getAttribute('parent_id');
+                $category = $parentId ? Category::query()->find($parentId, ['id', 'slug', 'parent_id']) : null;
+                $guard++;
+            }
+
+            $name = (string) (config('catmarket.category_images')[$slug] ?? 'hero');
+            $cache[$categoryId] = \Modules\CatMarket\Support\SiteImages::url($name) ?? \Modules\CatMarket\Support\SiteImages::url('hero');
+        }
+
+        return $cache[$categoryId];
     }
 
     public function primaryImageUrl(string $context = 'card', string $viewport = 'desktop'): ?string

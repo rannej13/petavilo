@@ -30,7 +30,7 @@ class PanelQuickListingForm extends Component
 {
     use WithFileUploads;
 
-    private const TOTAL_STEPS = 5;
+    private const TOTAL_STEPS = 4;
 
     private const DRAFT_SESSION_KEY = 'panel_quick_listing_draft';
 
@@ -152,19 +152,22 @@ class PanelQuickListingForm extends Component
     public function goToCategoryStep(): void
     {
         $this->publishError = null;
-        $this->validatePhotos();
-        $this->validateVideos();
-        $this->currentStep = 2;
-
-        if (! $this->isDetecting && ! $this->detectedCategoryId) {
-            $this->detectCategoryFromImage();
-        }
+        $this->currentStep = 1;
     }
 
     public function goToDetailsStep(): void
     {
         $this->publishError = null;
         $this->validateCategoryStep();
+        $this->currentStep = 2;
+    }
+
+    public function goToPhotosStep(): void
+    {
+        $this->publishError = null;
+        $this->validateCategoryStep();
+        $this->validateDetailsStep();
+        $this->validateCustomFieldsStep();
         $this->currentStep = 3;
     }
 
@@ -174,7 +177,9 @@ class PanelQuickListingForm extends Component
         $this->validateCategoryStep();
         $this->validateDetailsStep();
         $this->validateCustomFieldsStep();
-        $this->currentStep = 5;
+        $this->validatePhotos();
+        $this->validateVideos();
+        $this->currentStep = 4;
     }
 
     public function detectCategoryFromImage(): void
@@ -329,11 +334,10 @@ class PanelQuickListingForm extends Component
     public function getCurrentStepTitleProperty(): string
     {
         return match ($this->currentStep) {
-            1 => 'Photos',
-            2 => 'Category',
-            3 => 'Basics',
-            4 => 'Details',
-            5 => 'Review',
+            1 => 'Category',
+            2 => 'Details',
+            3 => 'Photos',
+            4 => 'Review',
             default => 'New Listing',
         };
     }
@@ -341,11 +345,10 @@ class PanelQuickListingForm extends Component
     public function getCurrentStepHintProperty(): string
     {
         return match ($this->currentStep) {
-            1 => 'Add photos and optional videos first.',
-            2 => 'Pick the right category.',
-            3 => 'Add the basics.',
-            4 => 'Add extra details if needed.',
-            5 => 'Check everything before publishing.',
+            1 => 'Pick the right category.',
+            2 => 'Describe your cat, item or service.',
+            3 => 'Add photos if you have them. You can skip this step.',
+            4 => 'Check everything before publishing.',
             default => 'Create a new listing.',
         };
     }
@@ -416,9 +419,8 @@ class PanelQuickListingForm extends Component
     {
         $this->validate([
             'photos' => [
-                'required',
+                'nullable',
                 'array',
-                'min:1',
                 'max:'.config('quick-listing.max_photo_count', 20),
             ],
             'photos.*' => [
@@ -725,12 +727,8 @@ class PanelQuickListingForm extends Component
     {
         $normalizedKeys = collect($keys)->map(fn (int|string $key): string => (string) $key)->values();
 
-        if ($normalizedKeys->contains(fn (int|string $key): bool => str_starts_with($key, 'photos') || str_starts_with($key, 'videos'))) {
-            return 1;
-        }
-
         if ($normalizedKeys->contains('selectedCategoryId')) {
-            return 2;
+            return 1;
         }
 
         if ($normalizedKeys->contains(fn (int|string $key): mixed => in_array($key, [
@@ -740,14 +738,18 @@ class PanelQuickListingForm extends Component
             'selectedCountryId',
             'selectedCityId',
         ], true))) {
-            return 3;
+            return 2;
         }
 
         if ($normalizedKeys->contains(fn (int|string $key): mixed => str_starts_with($key, 'customFieldValues.'))) {
-            return 4;
+            return 2;
         }
 
-        return 5;
+        if ($normalizedKeys->contains(fn (int|string $key): bool => str_starts_with($key, 'photos') || str_starts_with($key, 'videos'))) {
+            return 3;
+        }
+
+        return 4;
     }
 
     private function restoreDraft(): void

@@ -1,8 +1,8 @@
 @php
     $steps = [
-        1 => __('panel::messages.photos'),
-        2 => __('site::messages.category'),
-        3 => __('site::messages.details'),
+        1 => __('site::messages.category'),
+        2 => __('site::messages.details'),
+        3 => __('panel::messages.photos'),
         4 => __('panel::messages.overview'),
     ];
 @endphp
@@ -44,7 +44,7 @@
 
         <section class="card">
             <div class="card__body">
-                @if($currentStep === 1)
+                @if($currentStep === 3)
                     <div class="upload">
                         <label class="upload__control" for="quick-photos">
                             <x-ui.icon name="image"/>
@@ -54,6 +54,10 @@
                         </label>
 
                         <div wire:loading wire:target="photos" class="text-muted">{{ __('panel::messages.uploading') }}</div>
+
+                        @if($photos === [])
+                            <p class="text-muted">No photos? No problem. Skip this step and your advert will show a Petavilo picture for its category. Adverts with real photos get far more replies, so you can add them later from My listings.</p>
+                        @endif
 
                         @if($photos !== [])
                             <div class="upload__grid">
@@ -93,7 +97,7 @@
                             @endif
                         </div>
                     </div>
-                @elseif($currentStep === 2)
+                @elseif($currentStep === 1)
                     <div class="stack">
                         @if($detectedError)
                             <div class="alert alert--caution"><x-ui.icon name="sparkle"/><span>{{ $detectedError }}</span></div>
@@ -147,7 +151,7 @@
 
                         @error('selectedCategoryId')<p class="field__error">{{ $message }}</p>@enderror
                     </div>
-                @elseif($currentStep === 3)
+                @elseif($currentStep === 2)
                     <div class="stack">
                         <div class="field">
                             <label class="field__label" for="listing-title">{{ __('panel::messages.title') }}</label>
@@ -276,11 +280,11 @@
                     @endif
 
                     @if($currentStep === 1)
-                        <button type="button" class="button button--primary" wire:click="goToCategoryStep">{{ __('site::messages.apply') }}</button>
-                    @elseif($currentStep === 2)
                         <button type="button" class="button button--primary" wire:click="goToDetailsStep">{{ __('site::messages.apply') }}</button>
+                    @elseif($currentStep === 2)
+                        <button type="button" class="button button--primary" wire:click="goToPhotosStep">{{ __('site::messages.apply') }}</button>
                     @elseif($currentStep === 3)
-                        <button type="button" class="button button--primary" wire:click="goToPreviewStep">{{ __('site::messages.apply') }}</button>
+                        <button type="button" class="button button--primary" wire:click="goToPreviewStep">{{ $photos === [] ? 'Skip photos' : __('site::messages.apply') }}</button>
                     @else
                         <button type="button" class="button button--primary button--large" wire:click="publishListing" wire:loading.attr="disabled">
                             <span wire:loading.remove wire:target="publishListing">{{ __('site::messages.post_listing_cta') }}</span>

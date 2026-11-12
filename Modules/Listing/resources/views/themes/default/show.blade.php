@@ -105,6 +105,10 @@
                             </div>
                         @endif
 
+                        @if($listing->usesPlaceholderImage())
+                            <p class="text-meta">The seller has not added photos yet, so this is a Petavilo stock picture. Ask the seller for real photos before you visit or pay.</p>
+                        @endif
+
                         @if($listing->getAttribute('is_example'))
                             <div class="notice notice--accent">{{ __('catmarket::messages.example_notice') }}</div>
                         @endif
