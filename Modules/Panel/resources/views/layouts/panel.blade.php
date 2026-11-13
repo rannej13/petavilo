@@ -13,6 +13,8 @@
         ['key' => 'videos', 'label' => __('panel::messages.videos'), 'icon' => 'video', 'url' => route('panel.videos.index'), 'count' => null],
         ['key' => 'membership', 'label' => __('billing::messages.membership'), 'icon' => 'star', 'url' => route('billing.membership.index'), 'count' => null],
         ['key' => 'business', 'label' => __('directory::messages.my_business'), 'icon' => 'building', 'url' => route('directory.panel.index'), 'count' => null],
+        ['key' => 'adoptions', 'label' => 'Adoptions', 'icon' => 'heart', 'url' => route('rescue.panel.mine'), 'count' => null],
+        ['key' => 'rescue', 'label' => 'My rescue', 'icon' => 'shield', 'url' => route('rescue.panel'), 'count' => null],
         ['key' => 'favorites', 'label' => __('panel::messages.favorites'), 'icon' => 'heart', 'url' => route('favorites.index'), 'count' => null],
         ['key' => 'profile', 'label' => __('panel::messages.profile'), 'icon' => 'user', 'url' => route('panel.profile.edit'), 'count' => null],
     ];

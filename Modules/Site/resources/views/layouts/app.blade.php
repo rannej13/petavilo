@@ -215,6 +215,13 @@
                     <a href="{{ route('listings.index') }}" class="nav-list__item"><span>{{ __('site::messages.all_listings') }}</span><x-ui.icon name="chevron-right"/></a>
                     <a href="{{ route('categories.index') }}" class="nav-list__item"><span>{{ __('site::messages.categories') }}</span><x-ui.icon name="chevron-right"/></a>
                     <a href="{{ route('promotions.plans') }}" class="nav-list__item"><span>{{ __('promotion::messages.plans') }}</span><x-ui.icon name="chevron-right"/></a>
+                    @if(\Illuminate\Support\Facades\Route::has('rescue.adopt'))
+                        <a href="{{ route('rescue.adopt') }}" class="nav-list__item"><span>Adopt a pet</span><x-ui.icon name="chevron-right"/></a>
+                        <a href="{{ route('rescue.rehome') }}" class="nav-list__item"><span>Rehome a pet</span><x-ui.icon name="chevron-right"/></a>
+                        <a href="{{ route('rescue.lost-found') }}" class="nav-list__item"><span>Lost &amp; found</span><x-ui.icon name="chevron-right"/></a>
+                        <a href="{{ route('rescue.found-animal') }}" class="nav-list__item"><span>Found an animal?</span><x-ui.icon name="chevron-right"/></a>
+                        <a href="{{ route('rescue.rescues') }}" class="nav-list__item"><span>Rescues</span><x-ui.icon name="chevron-right"/></a>
+                    @endif
                     @if(\Illuminate\Support\Facades\Route::has('directory.index'))
                         <a href="{{ route('directory.index') }}" class="nav-list__item"><span>{{ __('catmarket::messages.directory') }}</span><x-ui.icon name="chevron-right"/></a>
                     @endif

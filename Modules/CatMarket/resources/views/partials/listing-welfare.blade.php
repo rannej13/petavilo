@@ -11,7 +11,17 @@
     $badges = \Modules\CatMarket\Models\SellerVerification::badgesFor($sellerId);
     $isBreederMember = $isAnimal && \App\Support\MembershipDirectory::isBreederMember($sellerId);
     $isOwnerViewing = auth()->check() && $sellerId !== null && (int) auth()->id() === $sellerId;
+    $rescue = class_exists(\Modules\Rescue\Models\RescueOrganisation::class) ? \Modules\Rescue\Models\RescueOrganisation::verifiedForUser($sellerId) : null;
+    $isRehoming = (\Modules\CatMarket\Support\PetCatalog::leaf((string) $listing->category?->slug)['kind'] ?? null) === \Modules\CatMarket\Support\PetCatalog::KIND_REHOMING;
 @endphp
+
+@if($rescue && $isRehoming && ! $isOwnerViewing)
+    <div class="notice notice--accent">
+        <p class="notice__title">Listed by <a class="text-link" href="{{ route('rescue.show', $rescue->getAttribute('slug')) }}">{{ $rescue->getAttribute('name') }}</a>, a verified rescue</p>
+        <p>Apply online and the rescue will reply through the site.</p>
+        <a href="{{ route('rescue.apply', $listing->getKey()) }}" class="button button--primary">Apply to adopt</a>
+    </div>
+@endif
 
 @if($isAnimal)
     @if($listing->statusValue() === 'pending' && $isOwnerViewing)

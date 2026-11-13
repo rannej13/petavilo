@@ -1,0 +1,11 @@
+{
+    "name": "Rescue",
+    "alias": "rescue",
+    "description": "Verified rescues, adoption applications, rehoming help, lost and found hub, found-an-animal help and welfare polls.",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Rescue\\Providers\\RescueServiceProvider"
+    ],
+    "files": []
+}

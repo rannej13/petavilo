@@ -1,3 +1,33 @@
+@if(\Illuminate\Support\Facades\Route::has('rescue.adopt'))
+    <section class="section">
+        <div class="stack">
+            <h2 class="title-section">Rescue, rehoming and lost pets</h2>
+            <div class="grid grid--three">
+                <a href="{{ route('rescue.adopt') }}" class="card">
+                    @if($img = \Modules\CatMarket\Support\SiteImages::url('rehoming'))<img class="card__image" src="{{ $img }}" alt="A rescue cat waiting for a home" loading="lazy">@endif
+                    <div class="card__body stack stack--tight">
+                        <p class="text-eyebrow">Adopt</p>
+                        <p class="title-card">Pets from verified rescues and charities</p>
+                    </div>
+                </a>
+                <a href="{{ route('rescue.rehome') }}" class="card">
+                    @if($img = \Modules\CatMarket\Support\SiteImages::url('dogs'))<img class="card__image" src="{{ $img }}" alt="A puppy and an adult dog at home" loading="lazy">@endif
+                    <div class="card__body stack stack--tight">
+                        <p class="text-eyebrow">Rehome responsibly</p>
+                        <p class="title-card">Need to rehome your pet? Your options, free</p>
+                    </div>
+                </a>
+                <a href="{{ route('rescue.lost-found') }}" class="card">
+                    @if($img = \Modules\CatMarket\Support\SiteImages::url('lost-found'))<img class="card__image" src="{{ $img }}" alt="A lost pet poster" loading="lazy">@endif
+                    <div class="card__body stack stack--tight">
+                        <p class="text-eyebrow">Lost &amp; found</p>
+                        <p class="title-card">Report a lost or found pet free, or <span class="text-link">found an injured animal?</span></p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+@endif
 <section class="section">
     <div class="grid grid--three">
         @if(\Illuminate\Support\Facades\Route::has('directory.index'))
@@ -5,7 +35,7 @@
                 @if($img = \Modules\CatMarket\Support\SiteImages::url('services'))<img class="card__image" src="{{ $img }}" alt="A groomer at work" loading="lazy">@endif
                 <div class="card__body stack stack--tight">
                     <p class="text-eyebrow">{{ __('catmarket::messages.directory') }}</p>
-                    <p class="title-card">Vets, sitters, groomers and catteries near you</p>
+                    <p class="title-card">Vets, rescues, sitters, groomers and kennels near you</p>
                 </div>
             </a>
         @endif
