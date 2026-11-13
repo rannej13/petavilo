@@ -5,5 +5,6 @@
     <a href="{{ route('pettools.food') }}" class="pill {{ request()->routeIs('pettools.food') ? 'is-active' : '' }}">Food matcher</a>
     <a href="{{ route('pettools.calories') }}" class="pill {{ request()->routeIs('pettools.calories') ? 'is-active' : '' }}">Calories</a>
     <a href="{{ route('pettools.litter') }}" class="pill {{ request()->routeIs('pettools.litter') ? 'is-active' : '' }}">Litter problems</a>
+    <a href="{{ route('pettools.insurance') }}" class="pill {{ request()->routeIs('pettools.insurance') ? 'is-active' : '' }}">Insurance or savings?</a>
     <a href="{{ route('pettools.passport.about') }}" class="pill {{ request()->routeIs('pettools.passport.*') ? 'is-active' : '' }}">Pet Passport</a>
 </nav>

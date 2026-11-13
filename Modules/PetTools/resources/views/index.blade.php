@@ -39,6 +39,11 @@
                 <h2 class="title-card">Why is my cat going outside the tray?</h2>
                 <p class="text-muted">Ten questions, a clear fix list.</p>
             </div></a>
+            <a href="{{ route('pettools.insurance') }}" class="card"><div class="card__body stack stack--tight">
+                <p class="text-eyebrow">Vet bill simulator</p>
+                <h2 class="title-card">Pet insurance or a savings pot?</h2>
+                <p class="text-muted">Five years, one big vet bill, both ways.</p>
+            </div></a>
             <a href="{{ route('pettools.passport.about') }}" class="card"><div class="card__body stack stack--tight">
                 <p class="text-eyebrow">Pet Passport</p>
                 <h2 class="title-card">Health records, insurance and an emergency QR pass</h2>

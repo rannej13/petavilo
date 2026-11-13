@@ -12,6 +12,7 @@ Route::middleware('web')->name('pettools.')->group(function (): void {
     Route::get('/tools/food-matcher', [ToolsController::class, 'food'])->name('food');
     Route::get('/tools/calorie-calculator', [ToolsController::class, 'calories'])->name('calories');
     Route::get('/tools/litter-box-problems', [ToolsController::class, 'litter'])->name('litter');
+    Route::get('/tools/pet-insurance-or-savings', [ToolsController::class, 'insurance'])->name('insurance');
     Route::get('/tools/cat-pain-check', [ToolsController::class, 'painCheck'])->name('pain');
     Route::get('/tools/pet-passport', [ToolsController::class, 'passportAbout'])->name('passport.about');
     Route::get('/pass/{token}', [PassportController::class, 'pass'])->where('token', '[A-Za-z0-9]{32}')->name('pass');

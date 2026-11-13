@@ -10,6 +10,7 @@ use Illuminate\Routing\Controller;
 use Modules\CatMarket\Support\CatMarketSettings;
 use Modules\PetTools\Support\CalorieCalculator;
 use Modules\PetTools\Support\FoodMatcher;
+use Modules\PetTools\Support\InsuranceSimulator;
 use Modules\PetTools\Support\LitterForensics;
 use Modules\PetTools\Support\PainCheck;
 use Modules\PetTools\Support\Partners;
@@ -120,6 +121,30 @@ class ToolsController extends Controller
                 'url' => $host.'/s?k='.rawurlencode($search).($tag !== '' ? '&tag='.rawurlencode($tag) : ''),
             ])->all(),
             'affiliate' => $tag !== '',
+        ]);
+    }
+
+    public function insurance(Request $request): View
+    {
+        $country = $this->country();
+        $defaults = InsuranceSimulator::defaults($country);
+        $input = [];
+
+        foreach ($defaults as $key => $value) {
+            $input[$key] = is_numeric($request->query($key)) ? (float) $request->query($key) : $value;
+        }
+
+        $age = (string) $request->query('age', '');
+        $conditions = (string) $request->query('conditions', '');
+
+        return view('pettools::insurance', [
+            'input' => $input,
+            'age' => $age,
+            'conditions' => $conditions,
+            'result' => InsuranceSimulator::run($input),
+            'symbol' => $country === 'US' ? '$' : '£',
+            'country' => $country,
+            'insurers' => Partners::insurers($country),
         ]);
     }
 
