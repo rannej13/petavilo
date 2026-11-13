@@ -34,6 +34,11 @@
                 <h2 class="title-card">How much should I feed my cat or dog?</h2>
                 <p class="text-muted">Daily calories and grams, plus a 14-day plan for switching food.</p>
             </div></a>
+            <a href="{{ route('pettools.litter') }}" class="card"><div class="card__body stack stack--tight">
+                <p class="text-eyebrow">Litter Box Forensics</p>
+                <h2 class="title-card">Why is my cat going outside the tray?</h2>
+                <p class="text-muted">Ten questions, a clear fix list.</p>
+            </div></a>
             <a href="{{ route('pettools.passport.about') }}" class="card"><div class="card__body stack stack--tight">
                 <p class="text-eyebrow">Pet Passport</p>
                 <h2 class="title-card">Health records, insurance and an emergency QR pass</h2>

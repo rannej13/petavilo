@@ -116,6 +116,11 @@ class PassportController extends Controller
             : 'Welcome home! Missing banner removed.');
     }
 
+    public function sitterSheet(Request $request, int $pet): View
+    {
+        return view('pettools::passport.sitter-sheet', ['pet' => $this->owned($request, $pet)]);
+    }
+
     public function pass(string $token): Response
     {
         $pet = Pet::findByPass($token);
@@ -158,6 +163,14 @@ class PassportController extends Controller
             'owner_phone' => ['nullable', 'string', 'max:40'],
             'emergency_contact' => ['nullable', 'string', 'max:120'],
             'emergency_phone' => ['nullable', 'string', 'max:40'],
+            'feeding_instructions' => ['nullable', 'string', 'max:1000'],
+            'medication_instructions' => ['nullable', 'string', 'max:1000'],
+            'medication_method' => ['nullable', Rule::in(Pet::MEDICATION_METHODS)],
+            'hiding_spots' => ['nullable', 'string', 'max:300'],
+            'handling_tips' => ['nullable', 'string', 'max:1000'],
+            'routine_notes' => ['nullable', 'string', 'max:1000'],
+            'vet_account_number' => ['nullable', 'string', 'max:60'],
+            'vet_spending_cap' => ['nullable', 'numeric', 'min:0', 'max:99999'],
         ]);
     }
 

@@ -73,6 +73,23 @@
     </div></section>
 
     <section class="card"><div class="card__body stack">
+        <h2 class="card__title">For pet sitters</h2>
+        <p class="field__hint">Printed on the sitter fridge sheet. Be exact: grams, times and doses.</p>
+        <div class="field"><label class="field__label" for="feeding_instructions">Feeding</label><textarea id="feeding_instructions" name="feeding_instructions" class="textarea" rows="3" maxlength="1000" placeholder="e.g. 7am: 40 g wet food. 6pm: 40 g wet + 15 g biscuits. Fresh water twice a day.">{{ $value('feeding_instructions') }}</textarea></div>
+        <div class="field__row field__row--two">
+            <div class="field"><label class="field__label" for="medication_method">How medicine is given</label><select id="medication_method" name="medication_method" class="select"><option value="">No medicines</option>@foreach(\Modules\PetTools\Models\Pet::MEDICATION_METHODS as $method)<option @selected($value('medication_method') === $method)>{{ $method }}</option>@endforeach</select></div>
+            <div class="field"><label class="field__label" for="hiding_spots">Favourite hiding spots</label><input id="hiding_spots" name="hiding_spots" class="input" maxlength="300" value="{{ $value('hiding_spots') }}" placeholder="Under the spare bed, top of the wardrobe"></div>
+        </div>
+        <div class="field"><label class="field__label" for="medication_instructions">Medicine instructions</label><textarea id="medication_instructions" name="medication_instructions" class="textarea" rows="3" maxlength="1000" placeholder="Name, dose, times, and where it is kept">{{ $value('medication_instructions') }}</textarea></div>
+        <div class="field"><label class="field__label" for="handling_tips">Handling tips</label><textarea id="handling_tips" name="handling_tips" class="textarea" rows="2" maxlength="1000" placeholder="Hates being picked up; use a towel for tablets">{{ $value('handling_tips') }}</textarea></div>
+        <div class="field"><label class="field__label" for="routine_notes">Routine, litter and walks</label><textarea id="routine_notes" name="routine_notes" class="textarea" rows="2" maxlength="1000">{{ $value('routine_notes') }}</textarea></div>
+        <div class="field__row field__row--two">
+            <div class="field"><label class="field__label" for="vet_account_number">Vet account or client number</label><input id="vet_account_number" name="vet_account_number" class="input" maxlength="60" value="{{ $value('vet_account_number') }}"></div>
+            <div class="field"><label class="field__label" for="vet_spending_cap">Vet bill I authorise the sitter to approve, up to</label><input id="vet_spending_cap" name="vet_spending_cap" type="number" step="1" min="0" class="input" value="{{ $value('vet_spending_cap') }}" placeholder="e.g. 500"></div>
+        </div>
+    </div></section>
+
+    <section class="card"><div class="card__body stack">
         <h2 class="card__title">Contacts for the emergency pass</h2>
         <div class="field__row field__row--three">
             <div class="field"><label class="field__label" for="owner_phone">Your phone</label><input id="owner_phone" name="owner_phone" type="tel" class="input" maxlength="40" value="{{ $value('owner_phone') }}"></div>

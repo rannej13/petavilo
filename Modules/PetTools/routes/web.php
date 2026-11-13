@@ -11,6 +11,7 @@ Route::middleware('web')->name('pettools.')->group(function (): void {
     Route::get('/tools/poison-checker', [ToolsController::class, 'poison'])->name('poison');
     Route::get('/tools/food-matcher', [ToolsController::class, 'food'])->name('food');
     Route::get('/tools/calorie-calculator', [ToolsController::class, 'calories'])->name('calories');
+    Route::get('/tools/litter-box-problems', [ToolsController::class, 'litter'])->name('litter');
     Route::get('/tools/cat-pain-check', [ToolsController::class, 'painCheck'])->name('pain');
     Route::get('/tools/pet-passport', [ToolsController::class, 'passportAbout'])->name('passport.about');
     Route::get('/pass/{token}', [PassportController::class, 'pass'])->where('token', '[A-Za-z0-9]{32}')->name('pass');
@@ -26,6 +27,7 @@ Route::middleware('web')->name('pettools.')->group(function (): void {
         Route::post('/{pet}/records', [PassportController::class, 'storeRecord'])->whereNumber('pet')->name('records.store');
         Route::delete('/{pet}/records/{record}', [PassportController::class, 'destroyRecord'])->whereNumber('pet')->whereNumber('record')->name('records.destroy');
         Route::post('/{pet}/pass', [PassportController::class, 'updatePass'])->whereNumber('pet')->name('pass.update');
+        Route::get('/{pet}/sitter-sheet', [PassportController::class, 'sitterSheet'])->whereNumber('pet')->name('sitter');
         Route::post('/{pet}/missing', [PassportController::class, 'toggleMissing'])->whereNumber('pet')->name('missing');
     });
 });

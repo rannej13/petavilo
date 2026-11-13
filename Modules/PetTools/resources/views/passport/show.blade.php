@@ -126,6 +126,12 @@
         </div></section>
 
         <section class="card"><div class="card__body stack stack--tight">
+            <h2 class="card__title">Going away?</h2>
+            <p class="text-muted">Print a one-page fridge sheet for your sitter with feeding, medicines, hiding spots, vet details and your spending limit.</p>
+            <a href="{{ route('pettools.passport.sitter', $pet->getKey()) }}" class="button button--secondary button--small" target="_blank">Sitter fridge sheet</a>
+        </div></section>
+
+        <section class="card"><div class="card__body stack stack--tight">
             <h2 class="card__title">Missing?</h2>
             <form method="POST" action="{{ route('pettools.passport.missing', $pet->getKey()) }}">
                 @csrf

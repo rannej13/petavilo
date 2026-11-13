@@ -25,13 +25,18 @@ class Pet extends Model
         'medical' => 'Medical notes, allergies and medicines',
         'diet' => 'Diet',
         'insurance' => 'Insurer and claims phone (not the policy number)',
+        'sitter' => 'Sitter care sheet: feeding, medicines, hiding spots, routine and vet spending limit',
     ];
+
+    public const MEDICATION_METHODS = ['Tablet or liquid by mouth', 'Gel rubbed on the ear', 'Injection under the skin', 'Insulin injection', 'Eye or ear drops', 'Other'];
 
     protected $fillable = [
         'name', 'species', 'breed', 'sex', 'date_of_birth', 'colour', 'neutered',
         'microchip_number', 'microchip_database', 'medical_notes', 'allergies', 'medications', 'diet',
         'vet_name', 'vet_phone', 'insurer', 'policy_number', 'policy_type', 'policy_renewal',
         'policy_excess', 'policy_limit', 'insurer_claims_phone', 'owner_phone', 'emergency_contact', 'emergency_phone',
+        'feeding_instructions', 'medication_instructions', 'medication_method', 'hiding_spots', 'handling_tips',
+        'routine_notes', 'vet_account_number', 'vet_spending_cap',
     ];
 
     protected $casts = [

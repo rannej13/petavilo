@@ -10,6 +10,7 @@ use Illuminate\Routing\Controller;
 use Modules\CatMarket\Support\CatMarketSettings;
 use Modules\PetTools\Support\CalorieCalculator;
 use Modules\PetTools\Support\FoodMatcher;
+use Modules\PetTools\Support\LitterForensics;
 use Modules\PetTools\Support\PainCheck;
 use Modules\PetTools\Support\Partners;
 use Modules\PetTools\Support\ToxinLibrary;
@@ -88,6 +89,36 @@ class ToolsController extends Controller
                 'label' => $textures[$key],
                 'url' => $host.'/s?k='.rawurlencode(trim('complete cat food '.$textures[$key].' '.$protein)).($tag !== '' ? '&tag='.rawurlencode($tag) : ''),
             ])->all() : [],
+            'affiliate' => $tag !== '',
+        ]);
+    }
+
+    public function litter(Request $request): View
+    {
+        $questions = LitterForensics::questions();
+        $answers = [];
+
+        foreach ($questions as $key => $question) {
+            $value = (string) $request->query($key, '');
+
+            if (array_key_exists($value, $question['options'])) {
+                $answers[$key] = $value;
+            }
+        }
+
+        $country = $this->country();
+        $tag = (string) config($country === 'US' ? 'catmarket.amazon.us' : 'catmarket.amazon.uk', '');
+        $host = $country === 'US' ? 'https://www.amazon.com' : 'https://www.amazon.co.uk';
+        $result = isset($answers['medical']) ? LitterForensics::diagnose($answers) : null;
+
+        return view('pettools::litter', [
+            'questions' => $questions,
+            'answers' => $answers,
+            'result' => $result,
+            'shopping' => collect($result['shopping'] ?? [])->map(static fn (string $search): array => [
+                'label' => ucfirst($search),
+                'url' => $host.'/s?k='.rawurlencode($search).($tag !== '' ? '&tag='.rawurlencode($tag) : ''),
+            ])->all(),
             'affiliate' => $tag !== '',
         ]);
     }

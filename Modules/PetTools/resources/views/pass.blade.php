@@ -50,6 +50,10 @@
             @endif
         </ul>
 
+        @if($pet->shows('sitter'))
+            @include('pettools::partials.sitter-details', ['pet' => $pet])
+        @endif
+
         <div class="notice">
             <p class="notice__title">Found this pet hurt?</p>
             <p>Take them to the nearest vet. Any vet can also scan their microchip. <a class="text-link" href="{{ route('rescue.found-animal') }}">Who to call</a></p>
