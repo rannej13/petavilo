@@ -55,6 +55,11 @@
                 <p class="text-muted">Vaccination reminders, weight, vet details and insurance renewal in one place.</p>
             </div></a>
         </div>
+
+        <aside class="notice notice--accent">
+            <p class="notice__title">Run a vet practice?</p>
+            <p>Put our triage form on your own website and get pre-exam notes by email. <a class="text-link" href="{{ route('pettools.clinic.landing') }}">See the clinic widget</a></p>
+        </aside>
     </div>
 </div>
 @endsection

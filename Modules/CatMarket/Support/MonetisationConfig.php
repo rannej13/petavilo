@@ -37,6 +37,8 @@ final class MonetisationConfig
             'billing.memberships.directory-plus.price_id_usd' => $settings->stripe_price_directory_plus_usd,
             'billing.memberships.directory-premium.price_id' => $settings->stripe_price_directory_premium,
             'billing.memberships.directory-premium.price_id_usd' => $settings->stripe_price_directory_premium_usd,
+            'billing.memberships.clinic-triage.price_id' => $settings->stripe_price_clinic,
+            'billing.memberships.clinic-triage.price_id_usd' => $settings->stripe_price_clinic_usd,
             'ads.client' => $settings->adsense_client,
             'ads.slots.home' => $settings->adsense_slot_home,
             'ads.slots.listing_infeed' => $settings->adsense_slot_listing_infeed,

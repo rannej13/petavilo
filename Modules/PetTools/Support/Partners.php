@@ -36,7 +36,7 @@ final class Partners
     private static function value(string $key): string
     {
         try {
-            return trim((string) (app(MonetisationSettings::class)->{$key} ?? ''));
+            return trim((string) app(MonetisationSettings::class)->{$key});
         } catch (Throwable) {
             return '';
         }

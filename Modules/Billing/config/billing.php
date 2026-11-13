@@ -32,5 +32,13 @@ return [
             'audience' => 'business',
             'tier' => 'premium',
         ],
+        'clinic-triage' => [
+            'type' => 'clinic',
+            'price_id' => env('STRIPE_PRICE_CLINIC'),
+            'price_id_usd' => env('STRIPE_PRICE_CLINIC_USD'),
+            'amount' => '99.00',
+            'amount_usd' => '129.00',
+            'audience' => 'clinic',
+        ],
     ],
 ];

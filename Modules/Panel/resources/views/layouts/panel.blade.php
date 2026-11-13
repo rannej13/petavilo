@@ -15,6 +15,7 @@
         ['key' => 'business', 'label' => __('directory::messages.my_business'), 'icon' => 'building', 'url' => route('directory.panel.index'), 'count' => null],
         ['key' => 'pets', 'label' => 'My pets', 'icon' => 'heart', 'url' => route('pettools.passport.index'), 'count' => null],
         ['key' => 'adoptions', 'label' => 'Adoptions', 'icon' => 'heart', 'url' => route('rescue.panel.mine'), 'count' => null],
+        ['key' => 'clinic', 'label' => 'Clinic widget', 'icon' => 'building', 'url' => route('pettools.clinic.dashboard'), 'count' => null],
         ['key' => 'rescue', 'label' => 'My rescue', 'icon' => 'shield', 'url' => route('rescue.panel'), 'count' => null],
         ['key' => 'favorites', 'label' => __('panel::messages.favorites'), 'icon' => 'heart', 'url' => route('favorites.index'), 'count' => null],
         ['key' => 'profile', 'label' => __('panel::messages.profile'), 'icon' => 'user', 'url' => route('panel.profile.edit'), 'count' => null],

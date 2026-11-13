@@ -23,7 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
             SetLocale::class,
         ]);
 
-        $middleware->validateCsrfTokens(except: ['stripe/*', 'directory/unsubscribe/*']);
+        $middleware->validateCsrfTokens(except: ['stripe/*', 'directory/unsubscribe/*', 'widget/triage/*']);
         $middleware->trustProxies(at: '*');
 
         $middleware->appendToPriorityList(StartSession::class, ResolveDemoRequest::class);

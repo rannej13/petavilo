@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
+use Modules\PetTools\Http\Controllers\ClinicTriageController;
 use Modules\PetTools\Http\Controllers\PassportController;
 use Modules\PetTools\Http\Controllers\ToolsController;
 
@@ -17,6 +18,13 @@ Route::middleware('web')->name('pettools.')->group(function (): void {
     Route::post('/tools/vet-check-request', [ToolsController::class, 'storeLead'])->middleware('throttle:5,10')->name('lead');
     Route::get('/tools/cat-pain-check', [ToolsController::class, 'painCheck'])->name('pain');
     Route::get('/tools/pet-passport', [ToolsController::class, 'passportAbout'])->name('passport.about');
+    Route::get('/for-vets', [ClinicTriageController::class, 'forVets'])->name('clinic.landing');
+    Route::get('/widget/triage/{token}', [ClinicTriageController::class, 'widget'])->where('token', '[A-Za-z0-9]{32}')->name('widget');
+    Route::post('/widget/triage/{token}', [ClinicTriageController::class, 'submit'])->where('token', '[A-Za-z0-9]{32}')->middleware('throttle:10,10')->name('widget.submit');
+    Route::middleware('auth')->group(function (): void {
+        Route::get('/panel/clinic-triage', [ClinicTriageController::class, 'dashboard'])->name('clinic.dashboard');
+        Route::post('/panel/clinic-triage', [ClinicTriageController::class, 'save'])->name('clinic.save');
+    });
     Route::get('/pass/{token}', [PassportController::class, 'pass'])->where('token', '[A-Za-z0-9]{32}')->name('pass');
 
     Route::middleware('auth')->prefix('panel/pets')->name('passport.')->group(function (): void {
