@@ -62,8 +62,25 @@ class UserNotification extends Model
         ]);
 
         $notification->save();
+        $notification->sendEmail();
 
         return $notification;
+    }
+
+    public function sendEmail(): void
+    {
+        try {
+            $user = \Modules\User\App\Models\User::query()->find($this->getAttribute('user_id'));
+
+            if ($user === null || blank($user->getAttribute('email')) || ! (bool) ($user->getAttribute('email_notifications') ?? true) || str_ends_with((string) $user->getAttribute('email'), '.invalid')) {
+                return;
+            }
+
+            \Illuminate\Support\Facades\Mail::to((string) $user->getAttribute('email'))->queue(new \Modules\Notification\Mail\NotificationMail($this));
+            $this->forceFill(['emailed_at' => now()])->saveQuietly();
+        } catch (\Throwable $exception) {
+            report($exception);
+        }
     }
 
     public static function unreadCountForUser(int $userId): int

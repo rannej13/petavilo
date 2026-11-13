@@ -31,6 +31,7 @@ class ProfileController extends Controller
             ],
         ]);
 
+        $validated['email_notifications'] = $request->boolean('email_notifications');
         $request->user()->updateProfile($validated);
 
         return redirect()->route('panel.profile.edit')->with('status', 'profile-updated');

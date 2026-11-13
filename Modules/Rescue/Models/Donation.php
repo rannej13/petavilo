@@ -84,6 +84,72 @@ class Donation extends Model
             'donor_email' => $email ?: $this->getAttribute('donor_email'),
             'payment_intent' => $paymentIntent,
         ])->save();
+
+        $this->sendReceipt();
+        $this->notifyRescue();
+    }
+
+    private function sendReceipt(): void
+    {
+        $email = (string) $this->getAttribute('donor_email');
+        $organisation = $this->organisation;
+
+        if ($email === '' || $organisation === null) {
+            return;
+        }
+
+        $site = (string) config('catmarket.site_name', 'Petavilo');
+        $lines = [
+            'Thank you for your donation to '.$organisation->getAttribute('name').'.',
+            '',
+            'Reference: D'.str_pad((string) $this->getKey(), 6, '0', STR_PAD_LEFT),
+            'Date: '.now()->isoFormat('D MMMM YYYY'),
+            'Donation to the rescue: '.$this->amountLabel(),
+        ];
+
+        if ((float) $this->getAttribute('fee_cover') > 0) {
+            $lines[] = 'Card fee you covered: '.$this->feeCoverLabel();
+        }
+
+        if ((float) $this->getAttribute('tip') > 0) {
+            $lines[] = 'Your tip to '.$site.': '.$this->tipLabel();
+        }
+
+        $lines[] = 'Total paid: '.$this->totalLabel();
+
+        if (filled($organisation->getAttribute('charity_number'))) {
+            $lines[] = ($organisation->getAttribute('country') === 'US' ? 'EIN: ' : 'Charity number: ').$organisation->getAttribute('charity_number');
+        }
+
+        $lines[] = '';
+        $lines[] = 'The full donation amount was passed to the rescue by Stripe. '.$site.' received only the tip shown above, if any.';
+
+        try {
+            \Illuminate\Support\Facades\Mail::raw(implode("\n", $lines), static function ($message) use ($email, $organisation): void {
+                $message->to($email)->subject('Your donation to '.$organisation->getAttribute('name'));
+            });
+        } catch (\Throwable $exception) {
+            report($exception);
+        }
+    }
+
+    private function notifyRescue(): void
+    {
+        $organisation = $this->organisation;
+
+        if ($organisation === null || $organisation->getAttribute('user_id') === null || ! class_exists(\Modules\Notification\Models\UserNotification::class)) {
+            return;
+        }
+
+        $from = $this->getAttribute('is_anonymous') ? 'An anonymous supporter' : ((string) $this->getAttribute('donor_name') ?: 'A supporter');
+
+        \Modules\Notification\Models\UserNotification::publish(
+            (int) $organisation->getAttribute('user_id'),
+            \Modules\Notification\Models\UserNotification::TYPE_PROMOTION,
+            'New donation: '.$this->amountLabel(),
+            $from.($this->getAttribute('message') ? ' wrote: '.$this->getAttribute('message') : ' donated.'),
+            route('rescue.panel'),
+        );
     }
 
     public static function feeCoverFor(float $amount, string $currency): float

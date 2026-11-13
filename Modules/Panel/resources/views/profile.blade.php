@@ -42,6 +42,8 @@
                     @error('phone')<p class="field__error">{{ $message }}</p>@enderror
                 </div>
 
+                <label class="row"><input type="checkbox" name="email_notifications" value="1" @checked(old('email_notifications', $user->getAttribute('email_notifications') ?? true))> <span>Email me about new messages, adoption updates, reminders and payments</span></label>
+
                 <button type="submit" class="button button--primary">{{ __('user::messages.save_changes') }}</button>
             </form>
         </section>

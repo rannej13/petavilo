@@ -48,7 +48,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     use SoftDeletes;
     use TwoFactorAuthenticatable;
 
-    protected $fillable = ['name', 'email', 'password', 'avatar_url', 'status'];
+    protected $fillable = ['name', 'email', 'password', 'avatar_url', 'status', 'email_notifications'];
 
     protected $hidden = ['password', 'remember_token'];
 

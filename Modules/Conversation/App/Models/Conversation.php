@@ -153,8 +153,21 @@ class Conversation extends Model
         ]);
 
         $this->forceFill(['last_message_at' => $message->created_at])->save();
+        $message->loadMissing('sender:id,name');
 
-        return $message->loadMissing('sender:id,name');
+        $recipientId = (int) $this->buyer_id === $senderId ? (int) $this->seller_id : (int) $this->buyer_id;
+
+        if ($recipientId > 0 && $this->unreadCountForParticipant($recipientId) === 1 && class_exists(\Modules\Notification\Models\UserNotification::class)) {
+            \Modules\Notification\Models\UserNotification::publish(
+                $recipientId,
+                \Modules\Notification\Models\UserNotification::TYPE_MESSAGE,
+                'New message from '.($message->sender?->name ?? 'someone'),
+                \Illuminate\Support\Str::limit($body, 140),
+                route('panel.inbox.index'),
+            );
+        }
+
+        return $message;
     }
 
     public function unreadCountForParticipant(int $userId): int
