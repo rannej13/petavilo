@@ -26,10 +26,17 @@ class CatMarketServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom(module_path('CatMarket', 'lang'), 'catmarket');
 
         if ($this->app->runningInConsole()) {
-            $this->commands([InstallCommand::class, ImagesCommand::class]);
+            $this->commands([InstallCommand::class, ImagesCommand::class, \Modules\CatMarket\Console\ListingRemindersCommand::class, \Modules\CatMarket\Console\AdminDigestCommand::class]);
         }
 
         Listing::observe(AnimalListingObserver::class);
+
+        \Illuminate\Support\Facades\Event::listen(\Illuminate\Auth\Events\Registered::class, \Modules\CatMarket\Listeners\SendWelcomeEmail::class);
+
+        $this->callAfterResolving(\Illuminate\Console\Scheduling\Schedule::class, static function (\Illuminate\Console\Scheduling\Schedule $schedule): void {
+            $schedule->command('catmarket:listing-reminders')->dailyAt('09:05')->withoutOverlapping();
+            $schedule->command('catmarket:admin-digest')->dailyAt('08:35')->withoutOverlapping();
+        });
 
         $this->app->booted(static fn () => MonetisationConfig::apply());
         \Illuminate\Support\Facades\Queue::before(static function (): void {

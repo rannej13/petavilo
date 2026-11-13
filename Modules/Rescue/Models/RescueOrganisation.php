@@ -131,11 +131,23 @@ class RescueOrganisation extends Model
             'slug' => $organisation->getAttribute('slug') ?: static::uniqueSlug((string) $data['name']),
         ]);
 
+        $isNew = ! $organisation->exists;
+
         if ($organisation->getAttribute('status') !== self::STATUS_VERIFIED) {
             $organisation->setAttribute('status', self::STATUS_PENDING);
         }
 
         $organisation->save();
+
+        if ($isNew && class_exists(\Modules\CatMarket\Support\SiteEmails::class)) {
+            \Modules\CatMarket\Support\SiteEmails::admin('Rescue to verify: '.$organisation->getAttribute('name'), [
+                $organisation->getAttribute('name').' in '.$organisation->getAttribute('town').' ('.$organisation->getAttribute('country').') has asked to join as a rescue.',
+                'Charity number: '.($organisation->getAttribute('charity_number') ?: 'not given'),
+                'Contact: '.$organisation->getAttribute('contact_email'),
+                '',
+                'Check the charity register before verifying. Verified rescues get the badge and can take donations.',
+            ], url('/admin'));
+        }
 
         return $organisation;
     }
@@ -162,6 +174,14 @@ class RescueOrganisation extends Model
         }
 
         Cache::forget('rescue:verified-users');
+
+        if (class_exists(\Modules\CatMarket\Support\SiteEmails::class)) {
+            try {
+                \Modules\CatMarket\Support\SiteEmails::rescueVerified($this);
+            } catch (\Throwable $exception) {
+                report($exception);
+            }
+        }
     }
 
     public function suspend(): void

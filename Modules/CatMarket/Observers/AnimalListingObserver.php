@@ -77,19 +77,47 @@ final class AnimalListingObserver
     public function saved(Listing $listing): void
     {
         $key = spl_object_id($listing);
+        $reasons = self::$queuedReasons[$key] ?? null;
+        unset(self::$queuedReasons[$key]);
 
-        if (! array_key_exists($key, self::$queuedReasons)) {
+        if ($reasons !== null) {
+            AnimalListingReview::submit(
+                (int) $listing->getKey(),
+                $listing->getAttribute('user_id') === null ? null : (int) $listing->getAttribute('user_id'),
+                $reasons,
+            );
+        }
+
+        try {
+            self::sendEmails($listing, $reasons);
+        } catch (\Throwable $exception) {
+            report($exception);
+        }
+    }
+
+    private static function sendEmails(Listing $listing, ?array $reasons): void
+    {
+        if (app()->runningInConsole() || (bool) $listing->getAttribute('is_example')) {
             return;
         }
 
-        $reasons = self::$queuedReasons[$key];
-        unset(self::$queuedReasons[$key]);
+        $held = $listing->statusValue() === 'pending';
 
-        AnimalListingReview::submit(
-            (int) $listing->getKey(),
-            $listing->getAttribute('user_id') === null ? null : (int) $listing->getAttribute('user_id'),
-            $reasons,
-        );
+        if ($listing->wasRecentlyCreated) {
+            \Modules\CatMarket\Support\SiteEmails::listingPosted($listing, $held);
+        }
+
+        if ($reasons !== null) {
+            \Modules\CatMarket\Support\SiteEmails::admin(
+                'Advert to check: '.$listing->getAttribute('title'),
+                [
+                    ($held ? 'This advert is waiting for your approval before it goes live.' : 'This advert is live but was flagged for a look.'),
+                    '',
+                    ...array_map(static fn ($reason): string => '• '.$reason, $reasons),
+                ],
+                url('/admin'),
+            );
+        }
     }
 
     private static function actorIsTrusted(): bool

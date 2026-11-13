@@ -1,8 +1,8 @@
-{{ $title }}
+{!! $title !!}
 
-@if($body !== ''){{ $body }}
+@if($body !== ''){!! $body !!}
 
 @endif
-Open {{ $site }}: {{ $url }}
+Open {!! $site !!}: {!! $url !!}
 
-Turn off email notifications: {{ $settingsUrl }}
+Turn off email notifications: {!! $settingsUrl !!}

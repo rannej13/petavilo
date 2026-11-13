@@ -158,11 +158,26 @@ class Listing extends Model implements HasMedia
 
     public static function expireOutdated(): int
     {
-        return static::query()
+        $ids = static::query()
             ->active()
             ->whereNotNull('expires_at')
             ->where('expires_at', '<', now())
-            ->update(['status' => 'expired']);
+            ->pluck('id')
+            ->all();
+
+        if ($ids === []) {
+            return 0;
+        }
+
+        $count = static::query()->whereIn('id', $ids)->update(['status' => 'expired']);
+
+        if (class_exists(\Modules\CatMarket\Support\SiteEmails::class)) {
+            static::query()->whereIn('id', $ids)->get()->each(static function (self $listing): void {
+                \Modules\CatMarket\Support\SiteEmails::listingExpired($listing);
+            });
+        }
+
+        return $count;
     }
 
     public static function sellerIdOf(int $id): ?int

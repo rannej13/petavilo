@@ -53,6 +53,10 @@ class ClinicTriageController extends Controller
 
         if ($clinic === null) {
             TriageClinic::start($request->user(), $data);
+            \Modules\CatMarket\Support\SiteEmails::admin('New clinic trial: '.$data['name'], [
+                $data['name'].' ('.$data['country'].') has started a 14-day trial of the triage widget.',
+                'Contact: '.$data['email'],
+            ], url('/admin'));
 
             return redirect()->route('pettools.clinic.dashboard')->with('success', 'Your 14-day free trial has started. Copy the embed code below onto your website.');
         }

@@ -46,6 +46,10 @@ class SocialiteUser extends Model
                     'email_verified_at' => now(),
                 ],
             );
+
+            if ($user->wasRecentlyCreated && ! str_ends_with($email, '@social.local')) {
+                event(new \Illuminate\Auth\Events\Registered($user));
+            }
         }
 
         static::query()->updateOrCreate(
