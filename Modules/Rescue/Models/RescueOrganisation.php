@@ -36,6 +36,8 @@ class RescueOrganisation extends Model
         'accepts_fosters' => 'boolean',
         'takes_rehoming_requests' => 'boolean',
         'verified_at' => 'datetime',
+        'payouts_ready' => 'boolean',
+        'donations_enabled' => 'boolean',
     ];
 
     public static function statuses(): array
@@ -64,6 +66,25 @@ class RescueOrganisation extends Model
     public function applications(): HasMany
     {
         return $this->hasMany(AdoptionApplication::class, 'organisation_id');
+    }
+
+    public function donations(): HasMany
+    {
+        return $this->hasMany(Donation::class, 'organisation_id');
+    }
+
+    public function currency(): string
+    {
+        return $this->getAttribute('country') === 'US' ? 'USD' : 'GBP';
+    }
+
+    public function acceptsDonations(): bool
+    {
+        return (bool) config('rescue.donations_enabled', true)
+            && $this->isVerified()
+            && (bool) $this->getAttribute('donations_enabled')
+            && (bool) $this->getAttribute('payouts_ready')
+            && filled($this->getAttribute('stripe_account_id'));
     }
 
     public function scopeVerified(Builder $query): Builder

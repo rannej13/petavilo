@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
 use Modules\Rescue\Http\Controllers\AdoptionController;
+use Modules\Rescue\Http\Controllers\DonationController;
 use Modules\Rescue\Http\Controllers\RescueController;
 
 Route::middleware('web')->name('rescue.')->group(function (): void {
@@ -15,6 +16,8 @@ Route::middleware('web')->name('rescue.')->group(function (): void {
     Route::get('/welfare', [RescueController::class, 'welfare'])->name('welfare');
     Route::post('/welfare/{campaign}', [RescueController::class, 'answer'])->middleware('throttle:20,10')->name('welfare.answer');
     Route::get('/rescues', [RescueController::class, 'rescues'])->name('rescues');
+    Route::post('/rescues/{slug}/donate', [DonationController::class, 'donate'])->middleware('throttle:10,10')->name('donate');
+    Route::get('/donations/{donation}/thanks', [DonationController::class, 'thanks'])->whereNumber('donation')->name('donations.thanks');
 
     Route::middleware('auth')->group(function (): void {
         Route::get('/rescues/join', [RescueController::class, 'join'])->name('join');
@@ -24,6 +27,10 @@ Route::middleware('web')->name('rescue.')->group(function (): void {
         Route::get('/panel/rescue', [AdoptionController::class, 'dashboard'])->name('panel');
         Route::post('/panel/rescue/applications/{application}', [AdoptionController::class, 'update'])->whereNumber('application')->name('panel.update');
         Route::get('/panel/adoptions', [AdoptionController::class, 'mine'])->name('panel.mine');
+        Route::get('/panel/donations', [DonationController::class, 'mine'])->name('donations.mine');
+        Route::post('/panel/rescue/donations/connect', [DonationController::class, 'connect'])->name('donations.connect');
+        Route::get('/panel/rescue/donations/return', [DonationController::class, 'connectReturn'])->name('donations.connect.return');
+        Route::get('/panel/rescue/donations/refresh', [DonationController::class, 'connectRefresh'])->name('donations.connect.refresh');
         Route::post('/panel/adoptions/{application}/withdraw', [AdoptionController::class, 'withdraw'])->whereNumber('application')->name('panel.withdraw');
     });
 

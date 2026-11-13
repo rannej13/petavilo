@@ -7,7 +7,10 @@
     <div class="panel-head__text">
         <h1 class="title-page">My adoption applications</h1>
     </div>
-    <a href="{{ route('rescue.adopt') }}" class="button button--ghost">Browse pets to adopt</a>
+    <div class="row">
+        <a href="{{ route('rescue.donations.mine') }}" class="button button--ghost">My donations</a>
+        <a href="{{ route('rescue.adopt') }}" class="button button--ghost">Browse pets to adopt</a>
+    </div>
 </header>
 
 @if($applications->isEmpty())

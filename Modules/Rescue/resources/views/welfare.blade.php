@@ -45,6 +45,7 @@
         <div class="row row--wrap">
             <a href="{{ route('rescue.found-animal') }}" class="button button--primary">What to do if you find an animal</a>
             <a href="{{ route('rescue.foster') }}" class="button button--ghost">Foster or volunteer</a>
+            <a href="{{ route('rescue.rescues') }}" class="button button--ghost">Support a verified rescue</a>
         </div>
     </div>
 </div>

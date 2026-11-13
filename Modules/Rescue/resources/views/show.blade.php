@@ -41,8 +41,15 @@
                     <a class="button button--secondary" href="{{ $organisation->getAttribute('website') }}" rel="nofollow noopener" target="_blank">Visit website</a>
                 @endif
                 <p class="text-muted">To adopt, use Apply on an animal below. Your application goes straight to the rescue.</p>
+                @if($organisation->acceptsDonations())
+                    <a href="#donate" class="button button--primary">Donate</a>
+                @endif
             </div></aside>
         </div>
+
+        @if($organisation->acceptsDonations())
+            @include('rescue::partials.donate-box', ['organisation' => $organisation])
+        @endif
 
         <section class="stack">
             <h2 class="title-section">Animals looking for homes</h2>

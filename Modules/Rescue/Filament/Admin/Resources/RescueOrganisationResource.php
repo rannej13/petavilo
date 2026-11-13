@@ -54,6 +54,9 @@ class RescueOrganisationResource extends Resource
             Textarea::make('description')->rows(6)->columnSpanFull(),
             Toggle::make('accepts_fosters'),
             Toggle::make('takes_rehoming_requests'),
+            Toggle::make('donations_enabled')->label('Allow donations')->helperText('Switch off to pause the Donate button for this rescue.'),
+            TextInput::make('stripe_account_id')->label('Stripe account')->disabled()->dehydrated(false),
+            Toggle::make('payouts_ready')->label('Stripe ready for payments')->disabled()->dehydrated(false),
             Textarea::make('evidence_note')->label('Verification notes (admin only)')->rows(3)->columnSpanFull()
                 ->helperText('What you checked and when, for example: Charity Commission 1234567 checked 13 Nov 2026, name and address match.'),
         ]);
@@ -75,6 +78,7 @@ class RescueOrganisationResource extends Resource
                 TextColumn::make('country'),
                 TextColumn::make('town'),
                 TextColumn::make('user.email')->label('Account'),
+                \Filament\Tables\Columns\IconColumn::make('payouts_ready')->boolean()->label('Donations'),
                 TextColumn::make('created_at')->since()->sortable(),
             ])
             ->defaultSort('created_at', 'desc')

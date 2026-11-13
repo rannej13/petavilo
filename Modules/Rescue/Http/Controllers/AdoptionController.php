@@ -60,6 +60,11 @@ class AdoptionController extends Controller
     public function dashboard(Request $request): View
     {
         $organisation = RescueOrganisation::forUser((int) $request->user()->getKey());
+
+        if ($organisation !== null && filled($organisation->getAttribute('stripe_account_id')) && ! $organisation->getAttribute('payouts_ready')) {
+            \Modules\Rescue\Support\DonationGateway::refreshAccount($organisation);
+        }
+
         $applications = $organisation === null ? collect() : AdoptionApplication::query()
             ->where('organisation_id', $organisation->getKey())
             ->with('applicant:id,name')
@@ -71,6 +76,7 @@ class AdoptionController extends Controller
             'organisation' => $organisation,
             'applications' => $applications,
             'listingTitles' => $this->titles($applications->pluck('listing_id')->all()),
+            'donationTotals' => $organisation === null ? ['count' => 0, 'sum' => 0.0, 'currency' => 'GBP'] : \Modules\Rescue\Models\Donation::totalsFor($organisation),
         ]);
     }
 

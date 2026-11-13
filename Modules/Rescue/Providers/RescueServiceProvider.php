@@ -5,13 +5,28 @@ declare(strict_types=1);
 namespace Modules\Rescue\Providers;
 
 use App\Support\SitemapRegistry;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
+use Modules\Rescue\Console\ReconcileDonationsCommand;
 use Modules\Rescue\Models\RescueOrganisation;
 
 class RescueServiceProvider extends ServiceProvider
 {
+    public function register(): void
+    {
+        $this->mergeConfigFrom(module_path('Rescue', 'config/rescue.php'), 'rescue');
+    }
+
     public function boot(): void
     {
+        if ($this->app->runningInConsole()) {
+            $this->commands([ReconcileDonationsCommand::class]);
+        }
+
+        $this->callAfterResolving(Schedule::class, static function (Schedule $schedule): void {
+            $schedule->command('donations:reconcile')->everyTenMinutes();
+        });
+
         $this->loadMigrationsFrom(module_path('Rescue', 'Database/migrations'));
         $this->loadRoutesFrom(module_path('Rescue', 'routes/web.php'));
         $this->loadViewsFrom(module_path('Rescue', 'resources/views'), 'rescue');
