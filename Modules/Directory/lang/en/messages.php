@@ -96,7 +96,7 @@ return [
     'price_from_hint' => 'For example: Consultations from £45',
     'accreditation' => 'Accreditation',
     'accreditation_none' => 'None',
-    'accreditation_hint' => 'We check this against the accrediting body's official list before the badge shows.',
+    'accreditation_hint' => 'We check this against the official list of the accrediting body before the badge shows.',
     'accreditation_pending' => 'awaiting check',
     'emergency_care' => '24-hour or emergency care',
     'home_visits' => 'Home visits',
