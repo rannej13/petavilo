@@ -32,6 +32,9 @@ class CatMarketServiceProvider extends ServiceProvider
         Listing::observe(AnimalListingObserver::class);
 
         $this->app->booted(static fn () => MonetisationConfig::apply());
+        \Illuminate\Support\Facades\Queue::before(static function (): void {
+            MonetisationConfig::apply();
+        });
 
         $this->app['router']->pushMiddlewareToGroup('web', RememberRegion::class);
     }
