@@ -122,8 +122,33 @@ final class ToxinLibrary
         ];
     }
 
+    private const DETAILS = [
+        'chocolate' => ['Vomiting, diarrhoea, restlessness, fast heartbeat, tremors', null],
+        'xylitol-birch-sugar' => ['Weakness, wobbliness, collapse and seizures, sometimes within 30 minutes', 'Peanut butter without xylitol'],
+        'grapes-raisins-sultanas-and-currants' => ['Vomiting, not eating, tiredness, drinking or weeing more or less than usual', 'Plain apple slices or blueberries for dogs'],
+        'onions-garlic-leeks-and-chives' => ['Weakness, pale gums, fast breathing and red or brown urine, often days later', null],
+        'lilies' => ['Vomiting, drooling, hiding and not eating, then kidney failure within 1 to 3 days', 'Roses, sunflowers, orchids (Phalaenopsis) or gerbera'],
+        'sago-palm' => ['Vomiting, diarrhoea, weakness, jaundice', 'Areca palm or Kentia palm'],
+        'daffodils' => ['Vomiting, drooling, tummy pain, and heart rhythm changes with large amounts', null],
+        'foxglove' => ['Vomiting, slow or irregular heartbeat, weakness', null],
+        'yew' => ['Trembling, breathing difficulty, collapse, sudden death', null],
+        'azalea-and-rhododendron' => ['Drooling, vomiting, weakness, low blood pressure', null],
+        'spider-plant' => ['Mild tummy upset at most', null],
+        'paracetamol-acetaminophen' => ['Brown gums, swollen face or paws, breathing difficulty, especially in cats', null],
+        'ibuprofen-naproxen-and-aspirin' => ['Vomiting (sometimes with blood), black stools, not eating, kidney damage', null],
+        'permethrin-dog-flea-treatment' => ['Twitching, tremors, seizures, drooling', 'A flea product made for cats'],
+        'antifreeze-and-screen-wash' => ['Wobbly, drunk-looking, vomiting, then kidney failure 1 to 3 days later', null],
+        'slug-pellets' => ['Tremors, twitching, seizures, high temperature', 'Wool pellets, copper tape or beer traps'],
+        'rat-and-mouse-poison' => ['Bleeding, bruising, pale gums or breathing difficulty, often 3 to 5 days later', null],
+        'essential-oils-and-diffusers' => ['Drooling, wobbliness, breathing difficulty, skin irritation', null],
+        'non-stick-pan-fumes-aerosols-and-candles' => ['Sudden breathing difficulty, wobbliness, collapse in birds', 'Stainless steel or cast iron pans'],
+    ];
+
     private static function item(string $name, array $aliases, string $category, array $risk, string $note): array
     {
-        return ['slug' => Str::slug($name), 'name' => $name, 'aliases' => $aliases, 'category' => $category, 'risk' => $risk, 'note' => $note];
+        $slug = Str::slug($name);
+        [$symptoms, $swap] = self::DETAILS[$slug] ?? [null, null];
+
+        return ['slug' => $slug, 'name' => $name, 'aliases' => $aliases, 'category' => $category, 'risk' => $risk, 'note' => $note, 'symptoms' => $symptoms, 'swap' => $swap];
     }
 }

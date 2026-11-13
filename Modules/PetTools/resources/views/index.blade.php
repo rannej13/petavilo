@@ -19,10 +19,20 @@
                 <h2 class="title-card">Check food, plants, medicines and household products</h2>
                 <p class="text-muted">For dogs, cats, rabbits and birds, with who to call if your pet has eaten something.</p>
             </div></a>
+            <a href="{{ route('pettools.pain') }}" class="card"><div class="card__body stack stack--tight">
+                <p class="text-eyebrow">Cat pain check</p>
+                <h2 class="title-card">Is my cat in pain, or is it an emergency?</h2>
+                <p class="text-muted">A two-minute face check plus the warning signs that mean "call a vet now".</p>
+            </div></a>
             <a href="{{ route('pettools.food') }}" class="card"><div class="card__body stack stack--tight">
                 <p class="text-eyebrow">Food matcher</p>
                 <h2 class="title-card">What should my pet eat?</h2>
                 <p class="text-muted">Answer six quick questions for cats, dogs, rabbits and guinea pigs.</p>
+            </div></a>
+            <a href="{{ route('pettools.calories') }}" class="card"><div class="card__body stack stack--tight">
+                <p class="text-eyebrow">Calorie calculator</p>
+                <h2 class="title-card">How much should I feed my cat or dog?</h2>
+                <p class="text-muted">Daily calories and grams, plus a 14-day plan for switching food.</p>
             </div></a>
             <a href="{{ route('pettools.passport.about') }}" class="card"><div class="card__body stack stack--tight">
                 <p class="text-eyebrow">Pet Passport</p>

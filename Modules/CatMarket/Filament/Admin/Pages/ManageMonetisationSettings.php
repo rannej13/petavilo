@@ -64,6 +64,8 @@ class ManageMonetisationSettings extends SettingsPage
                     TextInput::make('stripe_price_directory_plus_usd')->label('Directory Plus ($)'),
                     TextInput::make('stripe_price_directory_premium')->label('Directory Premium (£)'),
                     TextInput::make('stripe_price_directory_premium_usd')->label('Directory Premium ($)'),
+                    TextInput::make('stripe_price_clinic')->label('Clinic triage widget (£)'),
+                    TextInput::make('stripe_price_clinic_usd')->label('Clinic triage widget ($)'),
                 ])->columns(2),
             Section::make('Google AdSense')
                 ->description('Leave blank until AdSense approves the site.')
@@ -75,6 +77,16 @@ class ManageMonetisationSettings extends SettingsPage
                     TextInput::make('adsense_slot_guide_top')->label('Guide top slot ID'),
                     TextInput::make('adsense_slot_guide_bottom')->label('Guide bottom slot ID'),
                     TextInput::make('adsense_slot_directory')->label('Directory slot ID'),
+                ])->columns(2),
+            Section::make('Partner links for pet tools')
+                ->description('Shown on the pain check, dental grader and insurance simulator. Leave blank to hide. Use only your own affiliate or partner links.')
+                ->schema([
+                    TextInput::make('televet_name_uk')->label('UK video vet name')->placeholder('e.g. FirstVet'),
+                    TextInput::make('televet_url_uk')->label('UK video vet link')->url(),
+                    TextInput::make('televet_name_us')->label('US video vet name'),
+                    TextInput::make('televet_url_us')->label('US video vet link')->url(),
+                    \Filament\Forms\Components\Textarea::make('insurers_uk')->label('UK insurer links')->rows(3)->helperText('One per line: Name | https://link'),
+                    \Filament\Forms\Components\Textarea::make('insurers_us')->label('US insurer links')->rows(3)->helperText('One per line: Name | https://link'),
                 ])->columns(2),
             Section::make('Amazon Associates')
                 ->description('Your tracking IDs. Amazon links in guides get the right tag automatically.')

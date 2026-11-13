@@ -66,6 +66,8 @@
                             @endforeach
                         </div>
                         <p class="text-muted">{{ $item['note'] }}</p>
+                        @if($item['symptoms'])<p><strong>Signs to watch for:</strong> {{ $item['symptoms'] }}</p>@endif
+                        @if($item['swap'])<p><strong>Safer swap:</strong> {{ $item['swap'] }}</p>@endif
                         @php $worst = collect($item['risk'])->only($species === null ? array_keys($item['risk']) : [$species])->values(); @endphp
                         @if($worst->contains('danger'))
                             <p><strong>{{ $levels['danger']['advice'] }}</strong></p>

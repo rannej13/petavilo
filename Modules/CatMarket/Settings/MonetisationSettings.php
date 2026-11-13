@@ -56,6 +56,22 @@ class MonetisationSettings extends Settings
 
     public ?string $mail_from_address;
 
+    public ?string $televet_name_uk;
+
+    public ?string $televet_url_uk;
+
+    public ?string $televet_name_us;
+
+    public ?string $televet_url_us;
+
+    public ?string $insurers_uk;
+
+    public ?string $insurers_us;
+
+    public ?string $stripe_price_clinic;
+
+    public ?string $stripe_price_clinic_usd;
+
     public static function group(): string
     {
         return 'monetisation';

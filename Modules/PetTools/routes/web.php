@@ -10,6 +10,8 @@ Route::middleware('web')->name('pettools.')->group(function (): void {
     Route::get('/tools', [ToolsController::class, 'index'])->name('index');
     Route::get('/tools/poison-checker', [ToolsController::class, 'poison'])->name('poison');
     Route::get('/tools/food-matcher', [ToolsController::class, 'food'])->name('food');
+    Route::get('/tools/calorie-calculator', [ToolsController::class, 'calories'])->name('calories');
+    Route::get('/tools/cat-pain-check', [ToolsController::class, 'painCheck'])->name('pain');
     Route::get('/tools/pet-passport', [ToolsController::class, 'passportAbout'])->name('passport.about');
     Route::get('/pass/{token}', [PassportController::class, 'pass'])->where('token', '[A-Za-z0-9]{32}')->name('pass');
 
