@@ -39,6 +39,11 @@
                 <h2 class="title-card">Why is my cat going outside the tray?</h2>
                 <p class="text-muted">Ten questions, a clear fix list.</p>
             </div></a>
+            <a href="{{ route('pettools.dental') }}" class="card"><div class="card__body stack stack--tight">
+                <p class="text-eyebrow">Dental &amp; senior check</p>
+                <h2 class="title-card">How healthy are my cat's teeth and kidneys?</h2>
+                <p class="text-muted">Four dental stages and early warning signs in older cats.</p>
+            </div></a>
             <a href="{{ route('pettools.insurance') }}" class="card"><div class="card__body stack stack--tight">
                 <p class="text-eyebrow">Vet bill simulator</p>
                 <h2 class="title-card">Pet insurance or a savings pot?</h2>

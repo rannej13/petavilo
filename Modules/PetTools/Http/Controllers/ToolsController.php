@@ -5,10 +5,16 @@ declare(strict_types=1);
 namespace Modules\PetTools\Http\Controllers;
 
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
+use Modules\PetTools\Models\VetLead;
+use Throwable;
 use Illuminate\Routing\Controller;
 use Modules\CatMarket\Support\CatMarketSettings;
 use Modules\PetTools\Support\CalorieCalculator;
+use Modules\PetTools\Support\DentalGrader;
 use Modules\PetTools\Support\FoodMatcher;
 use Modules\PetTools\Support\InsuranceSimulator;
 use Modules\PetTools\Support\LitterForensics;
@@ -146,6 +152,55 @@ class ToolsController extends Controller
             'country' => $country,
             'insurers' => Partners::insurers($country),
         ]);
+    }
+
+    public function dental(Request $request): View
+    {
+        $gums = (int) $request->query('gums', 0);
+        $age = (string) $request->query('age', '');
+
+        return view('pettools::dental', [
+            'gumStages' => DentalGrader::gumStages(),
+            'signs' => DentalGrader::signs(),
+            'seniorSigns' => DentalGrader::seniorSigns(),
+            'input' => $request->query(),
+            'result' => $gums > 0 ? DentalGrader::grade($gums, (array) $request->query('signs', []), $age, (array) $request->query('senior', [])) : null,
+            'country' => $this->country(),
+        ]);
+    }
+
+    public function storeLead(Request $request): RedirectResponse
+    {
+        \App\Support\SpamGuard::check($request, 'email');
+
+        $data = $request->validate([
+            'kind' => ['required', Rule::in([VetLead::KIND_DENTAL, VetLead::KIND_SENIOR])],
+            'name' => ['required', 'string', 'max:80'],
+            'email' => ['required', 'email', 'max:160'],
+            'phone' => ['nullable', 'string', 'max:40'],
+            'town' => ['required', 'string', 'max:80'],
+            'pet_name' => ['nullable', 'string', 'max:60'],
+            'summary' => ['nullable', 'string', 'max:300'],
+            'consent' => ['accepted'],
+        ]);
+
+        $lead = new VetLead();
+        $lead->fill([...$data, 'country' => $this->country(), 'answers' => $request->except(['_token', 'name', 'email', 'phone', 'consent', 'company_website', 'form_stamp'])]);
+        $lead->forceFill(['consented_at' => now()])->save();
+
+        try {
+            $to = (string) config('catmarket.company.email');
+
+            if ($to !== '') {
+                Mail::raw("New {$lead->kind} check request #{$lead->getKey()}\n{$lead->name} ({$lead->email} {$lead->phone})\n{$lead->town}, {$lead->country}\nPet: {$lead->pet_name}\n{$lead->summary}", static function ($message) use ($to): void {
+                    $message->to($to)->subject('New vet check request');
+                });
+            }
+        } catch (Throwable $exception) {
+            report($exception);
+        }
+
+        return back()->with('success', 'Thanks. We will pass your request to a vet near '.$lead->town.' and they will contact you to book. Reference #'.$lead->getKey().'.');
     }
 
     public function painCheck(Request $request): View

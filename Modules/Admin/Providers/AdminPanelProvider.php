@@ -27,6 +27,7 @@ use Modules\Category\CategoryPlugin;
 use Modules\Directory\DirectoryPlugin;
 use Modules\Community\CommunityPlugin;
 use Modules\Rescue\RescuePlugin;
+use Modules\PetTools\PetToolsPlugin;
 use Modules\Guide\GuidePlugin;
 use Modules\Demo\App\Http\Middleware\ResolveDemoRequest;
 use Modules\Listing\ListingPlugin;
@@ -97,6 +98,7 @@ class AdminPanelProvider extends PanelProvider
                 GuidePlugin::make(),
                 CommunityPlugin::make(),
                 RescuePlugin::make(),
+                PetToolsPlugin::make(),
             ])
             ->pages([Dashboard::class])
             ->middleware([
