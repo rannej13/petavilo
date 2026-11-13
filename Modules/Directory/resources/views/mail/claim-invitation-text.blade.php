@@ -3,7 +3,7 @@ Hello {{ $business->getAttribute('name') }} team,
 @if($isFollowUp)
 A quick reminder from {{ $site }}. Your free listing is still waiting for you to claim it.
 @else
-{{ $site }} is a directory and marketplace just for cat owners in the UK and US. {{ $business->getAttribute('name') }} already has a free {{ $typeName }} listing@if($business->getAttribute('town')) in {{ $business->getAttribute('town') }}@endif, built from public business information:
+{{ $site }} is a directory and marketplace just for pet owners in the UK and US. {{ $business->getAttribute('name') }} already has a free {{ $typeName }} listing@if($business->getAttribute('town')) in {{ $business->getAttribute('town') }}@endif, built from public business information:
 @endif
 
 {{ $listingUrl }}
@@ -11,9 +11,9 @@ A quick reminder from {{ $site }}. Your free listing is still waiting for you to
 Claiming it is free and takes two minutes. Once claimed you can:
 - correct your phone, website and address
 - add opening hours, services, prices and photos
-- show your Cat Friendly accreditation
+- show your accreditations
 - get the Verified badge
-- see how many cat owners viewed your page and clicked through
+- see how many pet owners viewed your page and clicked through
 
 Claim it here: {{ $claimUrl }}
 

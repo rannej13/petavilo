@@ -105,7 +105,7 @@
                     <div class="stack">
                         <div class="field">
                             <label class="field__label" for="listing-title">{{ __('panel::messages.title') }}</label>
-                            <input id="listing-title" type="text" class="input" wire:model.live.debounce.400ms="listingTitle" maxlength="70" placeholder="e.g. Ragdoll kittens ready now, or Large cat tree" autofocus>
+                            <input id="listing-title" type="text" class="input" wire:model.live.debounce.400ms="listingTitle" maxlength="70" placeholder="e.g. Cockapoo puppies ready now, or Large cat tree" autofocus>
                             <p class="text-muted">Keep it short and say what it is. Buyers see this first.</p>
                             @error('listingTitle')<p class="field__error">{{ $message }}</p>@enderror
                         </div>

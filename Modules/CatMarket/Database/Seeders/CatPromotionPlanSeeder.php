@@ -41,7 +41,7 @@ class CatPromotionPlanSeeder extends Seeder
                 'slug' => 'urgent-7',
                 'price_usd' => 2.49,
                 'name' => 'Urgent',
-                'description' => 'Show people this cat needs a home quickly.',
+                'description' => 'Show people this needs to go quickly.',
                 'price' => 1.99,
                 'duration_days' => 7,
                 'grants_featured' => false,

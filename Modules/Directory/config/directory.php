@@ -5,9 +5,9 @@ declare(strict_types=1);
 return [
     'types' => [
         'vets' => ['name' => 'Vets', 'singular' => 'Vet'],
-        'cat-sitters' => ['name' => 'Cat sitters', 'singular' => 'Cat sitter'],
+        'cat-sitters' => ['name' => 'Pet sitters & dog walkers', 'singular' => 'Pet sitter'],
         'groomers' => ['name' => 'Groomers', 'singular' => 'Groomer'],
-        'catteries' => ['name' => 'Catteries', 'singular' => 'Cattery'],
+        'catteries' => ['name' => 'Kennels & catteries', 'singular' => 'Kennels or cattery'],
         'behaviourists' => ['name' => 'Behaviourists', 'singular' => 'Behaviourist'],
         'rescues' => ['name' => 'Rescues & charities', 'singular' => 'Rescue'],
         'pet-shops' => ['name' => 'Pet shops', 'singular' => 'Pet shop'],

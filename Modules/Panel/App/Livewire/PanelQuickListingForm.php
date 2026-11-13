@@ -402,7 +402,7 @@ class PanelQuickListingForm extends Component
     {
         return match ($this->currentStep) {
             1 => 'Type a short title, then pick one of the suggested categories.',
-            2 => 'Describe your cat, item or service.',
+            2 => 'Describe your pet, item or service.',
             3 => 'Add photos if you have them. You can skip this step.',
             4 => 'Check everything before publishing.',
             default => 'Create a new listing.',

@@ -46,7 +46,7 @@
 
     <label class="row" style="align-items:flex-start;gap:var(--space-2)">
         <input type="checkbox" name="marketing_opt_in" value="1" @checked(old('marketing_opt_in'))>
-        <span class="text-meta">Send me occasional emails about new features and cat care tips (optional).</span>
+        <span class="text-meta">Send me occasional emails about new features and pet care tips (optional).</span>
     </label>
 
     <button type="submit" class="button button--primary button--block button--large">{{ __('site::messages.register') }}</button>

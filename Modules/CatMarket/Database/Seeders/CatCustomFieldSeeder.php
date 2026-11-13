@@ -6,7 +6,7 @@ namespace Modules\CatMarket\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
-use Modules\CatMarket\Support\CatCatalog;
+use Modules\CatMarket\Support\PetCatalog;
 use Modules\Category\Models\Category;
 use Modules\Listing\Models\ListingCustomField;
 
@@ -16,26 +16,23 @@ class CatCustomFieldSeeder extends Seeder
     {
         $count = 0;
 
-        foreach (CatCatalog::categories() as $root) {
-            foreach ($root['children'] as $childName) {
-                $leafSlug = CatCatalog::childSlug($root['slug'], $childName);
-                $leaf = Category::query()->where('slug', $leafSlug)->first();
+        foreach (array_keys(PetCatalog::leaves()) as $leafSlug) {
+            $leaf = Category::query()->where('slug', $leafSlug)->first();
 
-                if (! $leaf instanceof Category) {
-                    continue;
-                }
+            if (! $leaf instanceof Category) {
+                continue;
+            }
 
-                foreach (array_values(CatCatalog::fieldsFor($root['slug'], $leafSlug)) as $index => $field) {
-                    ListingCustomField::upsertSeeded($leaf, array_merge($field, [
-                        'name' => Str::slug($leafSlug.'_'.$field['name'], '_'),
-                        'is_active' => true,
-                        'sort_order' => ($index + 1) * 10,
-                    ]));
-                    $count++;
-                }
+            foreach (array_values(PetCatalog::fieldsFor($leafSlug)) as $index => $field) {
+                ListingCustomField::upsertSeeded($leaf, array_merge($field, [
+                    'name' => Str::slug($leafSlug.'_'.$field['name'], '_'),
+                    'is_active' => true,
+                    'sort_order' => ($index + 1) * 10,
+                ]));
+                $count++;
             }
         }
 
-        $this->command?->info("Seeded {$count} cat listing fields.");
+        $this->command?->info("Seeded {$count} pet listing fields.");
     }
 }

@@ -8,91 +8,173 @@ use Illuminate\Support\Str;
 
 final class TitleCategorySuggester
 {
-    private const KEYWORDS = [
-        'lost-and-found-lost-cats' => ['lost', 'missing', 'escaped', 'runaway'],
-        'lost-and-found-found-cats' => ['found', 'stray', 'turned up', 'wandered'],
-        'cat-products-cat-trees-furniture' => ['cat tree', 'tree', 'tower', 'scratch', 'scratching', 'post', 'bed', 'furniture', 'hammock', 'condo', 'shelf'],
-        'cat-products-carriers-travel' => ['carrier', 'crate', 'travel', 'backpack', 'pet bag', 'stroller'],
-        'cat-products-toys' => ['toy', 'toys', 'wand', 'teaser', 'tunnel', 'laser', 'kicker', 'catnip'],
-        'cat-products-bowls-feeders' => ['bowl', 'bowls', 'feeder', 'fountain', 'water dispenser'],
-        'cat-products-litter-trays' => ['litter tray', 'litter box', 'tray', 'litter mat', 'self cleaning'],
-        'cat-products-other-products' => ['food', 'harness', 'collar', 'cat flap', 'flap', 'brush', 'pen', 'playpen', 'enclosure', 'cage', 'gate'],
-        'cat-services-cat-sitting' => ['sitter', 'sitting', 'pet sitter', 'drop in', 'feeding visits', 'house sit'],
-        'cat-services-grooming' => ['groom', 'groomer', 'grooming', 'nail', 'bath'],
-        'cat-services-boarding' => ['boarding', 'cattery', 'holiday'],
-        'cat-services-behaviour-training' => ['behaviour', 'behavior', 'behaviourist', 'training', 'trainer'],
-        'cat-services-pet-transport' => ['transport', 'courier', 'relocation', 'pet taxi'],
-        'pedigree-cats-upcoming-litters' => ['upcoming litter', 'expected', 'due', 'pregnant', 'taking deposits', 'waiting list', 'reserve now'],
-        'kittens-pedigree-kittens' => ['pedigree kitten', 'gccf', 'tica', 'cfa', 'registered kitten', 'pedigree'],
-        'kittens-non-pedigree-kittens' => ['kitten', 'kittens', 'kitty', 'moggy kitten'],
-        'pedigree-cats-adult-pedigree-cats' => ['stud', 'queen', 'retired', 'breeding cat'],
-        'cats-for-rehoming-senior-cats' => ['senior', 'elderly', 'old cat', 'older'],
-        'cats-for-rehoming-bonded-pairs' => ['pair', 'bonded', 'brothers', 'sisters', 'siblings', 'two cats', '2 cats'],
-        'cats-for-rehoming-adult-cats' => ['rehome', 'rehoming', 'adopt', 'adoption', 'free to good home', 'needs a home', 'cat', 'tom', 'female cat', 'male cat'],
+    private const SPECIES_WORDS = [
+        'cat' => ['cat', 'cats', 'kitten', 'kittens', 'kitty', 'moggy', 'tabby', 'queen', 'tom'],
+        'dog' => ['dog', 'dogs', 'puppy', 'puppies', 'pup', 'pups', 'pooch', 'bitch', 'stud dog'],
+        'rabbit' => ['rabbit', 'rabbits', 'bunny', 'bunnies', 'kit', 'doe', 'buck'],
+        'small' => ['guinea pig', 'guinea pigs', 'hamster', 'hamsters', 'rat', 'rats', 'mouse', 'mice', 'gerbil', 'gerbils', 'ferret', 'ferrets', 'chinchilla', 'degu', 'degus', 'hedgehog'],
+        'bird' => ['bird', 'birds', 'budgie', 'budgies', 'cockatiel', 'canary', 'finch', 'finches', 'parrot', 'lovebird', 'conure', 'african grey', 'hen', 'hens', 'chicken', 'chickens', 'duck', 'ducks', 'pigeon', 'dove'],
+        'reptile' => ['reptile', 'bearded dragon', 'beardie', 'gecko', 'snake', 'python', 'corn snake', 'tortoise', 'turtle', 'terrapin', 'chameleon', 'lizard', 'axolotl', 'frog', 'iguana'],
+        'fish' => ['fish', 'goldfish', 'koi', 'guppy', 'guppies', 'betta', 'tetra', 'cichlid', 'shrimp', 'pleco'],
+    ];
+
+    private const ROOTS = [
+        'cat' => 'cats', 'dog' => 'dogs', 'rabbit' => 'rabbits', 'small' => 'small-animals',
+        'bird' => 'birds', 'reptile' => 'reptiles', 'fish' => 'fish',
+    ];
+
+    private const PRODUCT_WORDS = ['tree', 'tower', 'scratch', 'scratching', 'post', 'bed', 'beds', 'crate', 'carrier', 'cage', 'hutch', 'run', 'tank', 'aquarium', 'vivarium', 'viv', 'filter', 'heat lamp', 'toy', 'toys', 'bowl', 'bowls', 'feeder', 'fountain', 'litter tray', 'litter box', 'harness', 'collar', 'lead', 'leash', 'coat', 'kennel', 'flap', 'pen', 'playpen', 'gate', 'food', 'brush', 'stroller', 'backpack', 'perch'];
+
+    private const SERVICE_WORDS = [
+        'pet-services-dog-walking' => ['walker', 'walking', 'dog walks', 'walks'],
+        'pet-services-pet-sitting' => ['sitter', 'sitting', 'pet sitter', 'drop in', 'house sit', 'feeding visits'],
+        'pet-services-grooming' => ['groom', 'groomer', 'grooming', 'nail clip'],
+        'pet-services-boarding-kennels-catteries' => ['boarding', 'cattery', 'kennels', 'daycare', 'day care', 'home boarding'],
+        'pet-services-training-behaviour' => ['training', 'trainer', 'behaviour', 'behavior', 'behaviourist', 'puppy class', 'obedience'],
+        'pet-services-pet-transport' => ['transport', 'courier', 'pet taxi', 'relocation'],
+    ];
+
+    private const PRODUCT_LEAF = [
+        'cat' => 'pet-products-cat-supplies', 'dog' => 'pet-products-dog-supplies',
+        'rabbit' => 'pet-products-rabbit-small-animal-supplies', 'small' => 'pet-products-rabbit-small-animal-supplies',
+        'bird' => 'pet-products-bird-supplies', 'reptile' => 'pet-products-fish-reptile-supplies', 'fish' => 'pet-products-fish-reptile-supplies',
     ];
 
     public static function suggest(string $title, int $limit = 3): array
     {
         $text = ' '.Str::of($title)->lower()->replaceMatches('/[^a-z0-9 ]+/', ' ')->squish().' ';
 
-        if (trim($text) === '' || mb_strlen(trim($text)) < 3) {
+        if (mb_strlen(trim($text)) < 3) {
             return [];
         }
 
-        $scores = [];
+        $species = self::species($text);
+        $suggestions = [];
 
-        foreach (self::KEYWORDS as $slug => $words) {
-            foreach ($words as $word) {
-                if (str_contains($text, ' '.$word.' ') || str_contains($text, ' '.$word.'s ')) {
-                    $scores[$slug] = ($scores[$slug] ?? 0) + 1 + substr_count($word, ' ');
-                }
+        if (self::has($text, ['lost', 'missing', 'escaped', 'stolen'])) {
+            $suggestions[] = 'lost-and-found-lost-pets';
+        }
+
+        if (self::has($text, ['found', 'stray', 'turned up', 'wandered in'])) {
+            $suggestions[] = 'lost-and-found-found-pets';
+        }
+
+        foreach (self::SERVICE_WORDS as $slug => $words) {
+            if (self::has($text, $words)) {
+                $suggestions[] = $slug;
             }
         }
 
-        $breed = self::mentionsBreed($text);
-        $kitten = (bool) preg_match('/ kitt(en|ens|y|ies) /', $text);
+        if (self::has($text, self::PRODUCT_WORDS) || (str_contains($text, ' litter ') && ! self::young($text))) {
+            $suggestions[] = self::PRODUCT_LEAF[$species] ?? 'pet-products-other-pet-supplies';
+        }
 
-        if ($breed) {
-            if ($kitten) {
-                $scores['kittens-pedigree-kittens'] = ($scores['kittens-pedigree-kittens'] ?? 0) + 3;
-            } else {
-                $scores['pedigree-cats-adult-pedigree-cats'] = ($scores['pedigree-cats-adult-pedigree-cats'] ?? 0) + 2;
+        if ($suggestions === []) {
+            foreach (self::animalLeaves($text, $species) as $slug) {
+                $suggestions[] = $slug;
             }
         }
 
-        if (str_contains($text, ' litter ')) {
-            if ($kitten || $breed) {
-                $scores['pedigree-cats-upcoming-litters'] = ($scores['pedigree-cats-upcoming-litters'] ?? 0) + 1;
-                unset($scores['cat-products-litter-trays']);
-            } else {
-                $scores['cat-products-litter-trays'] = ($scores['cat-products-litter-trays'] ?? 0) + 2;
-            }
-        }
-
-        $hasSpecific = collect($scores)->keys()->contains(
-            fn (string $slug): bool => str_starts_with($slug, 'cat-products') || str_starts_with($slug, 'cat-services') || str_starts_with($slug, 'lost-and-found'),
-        );
-        if ($hasSpecific) {
-            unset($scores['cats-for-rehoming-adult-cats']);
-        }
-
-        arsort($scores);
-
-        return array_slice(array_keys($scores), 0, $limit);
+        return array_slice(array_values(array_unique($suggestions)), 0, $limit);
     }
 
-    private static function mentionsBreed(string $text): bool
+    private static function animalLeaves(string $text, ?string $species): array
     {
-        foreach (CatCatalog::breeds() as $breed) {
+        if ($species === null) {
+            return [];
+        }
+
+        $root = self::ROOTS[$species];
+        $rehoming = self::has($text, ['rehome', 'rehoming', 'adopt', 'adoption', 'free to good home', 'needs a home', 'new home', 'forever home', 'bonded', 'senior', 'elderly']);
+        $litter = self::has($text, ['upcoming litter', 'expected', 'due', 'pregnant', 'taking deposits', 'waiting list', 'reserve now']);
+        $registered = self::has($text, ['pedigree', 'kc registered', 'kc reg', 'kennel club', 'gccf', 'tica', 'akc', 'registered', 'champion', 'bloodline']);
+        $breed = self::mentionsBreed($text, $species);
+
+        if (! in_array($species, ['cat', 'dog'], true)) {
+            return $rehoming
+                ? [$root.'-'.Str::slug(self::plural($species).' for rehoming'), $root.'-'.Str::slug(self::plural($species).' for sale')]
+                : [$root.'-'.Str::slug(self::plural($species).' for sale'), $root.'-'.Str::slug(self::plural($species).' for rehoming')];
+        }
+
+        $young = $species === 'dog' ? 'dogs-puppies-for-sale' : 'cats-kittens-for-sale';
+        $pedigreeLeaf = $species === 'dog' ? 'dogs-pedigree-dogs-puppies' : 'cats-pedigree-cats-kittens';
+        $rehomingLeaf = $species === 'dog' ? 'dogs-dogs-for-rehoming' : 'cats-cats-for-rehoming';
+        $litterLeaf = $root.'-upcoming-litters';
+
+        return match (true) {
+            $litter => [$litterLeaf, $pedigreeLeaf],
+            $rehoming => [$rehomingLeaf],
+            $registered => [$pedigreeLeaf, $young],
+            self::young($text) => [$young, $pedigreeLeaf],
+            $breed => [$pedigreeLeaf, $rehomingLeaf],
+            default => [$rehomingLeaf, $pedigreeLeaf],
+        };
+    }
+
+    private static function plural(string $species): string
+    {
+        return match ($species) {
+            'rabbit' => 'Rabbits',
+            'small' => 'Small animals',
+            'bird' => 'Birds',
+            'reptile' => 'Reptiles',
+            'fish' => 'Fish',
+            default => 'Other pets',
+        };
+    }
+
+    private static function species(string $text): ?string
+    {
+        foreach (self::SPECIES_WORDS as $species => $words) {
+            if (self::has($text, $words)) {
+                return $species;
+            }
+        }
+
+        foreach (['cat', 'dog', 'rabbit'] as $species) {
+            if (self::mentionsBreed($text, $species)) {
+                return $species;
+            }
+        }
+
+        return null;
+    }
+
+    private static function young(string $text): bool
+    {
+        return self::has($text, ['kitten', 'kittens', 'puppy', 'puppies', 'pup', 'pups', 'litter']);
+    }
+
+    private static function mentionsBreed(string $text, string $species): bool
+    {
+        foreach (PetCatalog::breeds($species) as $breed) {
             $name = Str::of($breed)->lower()->before('(')->trim()->value();
+
             if (in_array($name, ['other', 'crossbreed', 'domestic shorthair', 'domestic longhair'], true)) {
                 continue;
             }
+
             if (str_contains($text, ' '.$name.' ') || str_contains($text, ' '.$name.'s ')) {
                 return true;
             }
         }
 
-        return (bool) preg_match('/ (bsh|blh|maine coon|raggie|ragdoll|sphinx|persian) /', $text);
+        $shorthands = [
+            'cat' => '/ (bsh|blh|raggie|sphinx) /',
+            'dog' => '/ (frenchie|frenchies|staffy|staffie|lab|labs|goldie|cockapoo|cavapoo|cavachon|pomsky|dachshund|sausage dog|jackapoo|maltipoo|shih tzu|gsd|husky|huskies) /',
+        ];
+
+        return isset($shorthands[$species]) && preg_match($shorthands[$species], $text) === 1;
+    }
+
+    private static function has(string $text, array $words): bool
+    {
+        foreach ($words as $word) {
+            if (str_contains($text, ' '.$word.' ')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

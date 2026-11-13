@@ -1,7 +1,7 @@
 @extends('site::layouts.app')
 
 @section('title', $typeName.($town !== '' ? ' in '.$town : ''))
-@section('description', $typeName.' for cats'.($town !== '' ? ' in '.$town : ' across the '.($region === 'US' ? 'US' : 'UK')).'.')
+@section('description', $typeName.' for pets'.($town !== '' ? ' in '.$town : ' across the '.($region === 'US' ? 'US' : 'UK')).'.')
 
 @section('content')
 <div class="shell shell--wide page">

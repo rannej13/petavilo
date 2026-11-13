@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 return [
     'guides' => 'Guides',
-    'guides_lead' => 'Practical advice on choosing, caring for and kitting out your cat.',
+    'guides_lead' => 'Practical advice on choosing, caring for and kitting out your pet.',
     'all' => 'All',
     'none' => 'No guides here yet.',
     'reviewed' => 'Last reviewed :date',

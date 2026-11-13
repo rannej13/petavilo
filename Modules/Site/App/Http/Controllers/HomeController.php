@@ -53,7 +53,7 @@ class HomeController extends Controller
             $businesses = array_sum(\Modules\Directory\Models\Business::countsByType($country));
 
             if ($businesses > 0) {
-                $stats[] = [number_format($businesses), 'vets, rescues & cat services'];
+                $stats[] = [number_format($businesses), 'vets, rescues & pet services'];
             }
         }
 
@@ -61,7 +61,7 @@ class HomeController extends Controller
             $guides = \Modules\Guide\Models\Guide::query()->published()->count();
 
             if ($guides > 0) {
-                $stats[] = [number_format($guides), 'free cat guides'];
+                $stats[] = [number_format($guides), 'free pet guides'];
             }
         }
 

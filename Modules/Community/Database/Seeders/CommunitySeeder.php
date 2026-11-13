@@ -14,7 +14,7 @@ class CommunitySeeder extends Seeder
     public function run(): void
     {
         foreach ($this->boards() as $index => $board) {
-            Board::query()->firstOrCreate(['slug' => $board['slug']], $board + ['sort_order' => $index + 1, 'is_active' => true]);
+            Board::query()->updateOrCreate(['slug' => $board['slug']], $board + ['sort_order' => $index + 1, 'is_active' => true]);
         }
 
         $admin = User::query()->where('email', (string) config('catmarket.admin.email'))->first();
@@ -43,14 +43,17 @@ class CommunitySeeder extends Seeder
     private function boards(): array
     {
         return [
-            ['name' => 'Introductions and cat photos', 'slug' => 'show-us-your-cat', 'image' => 'hero', 'description' => 'Say hello and show us your cats. Photos, names, funny habits and new arrivals.'],
-            ['name' => 'Kittens and new cats', 'slug' => 'kittens-and-new-cats', 'image' => 'kittens', 'description' => 'Bringing a kitten or rescue cat home: litter training, settling in, vaccinations and first weeks.'],
-            ['name' => 'Health and behaviour', 'slug' => 'health-and-behaviour', 'image' => 'guide-insurance', 'description' => 'Scratching, spraying, fussy eating, older cats and vet visits. Share what worked for you.'],
-            ['name' => 'Breeds', 'slug' => 'breeds', 'image' => 'pedigree', 'description' => 'Maine Coons, Ragdolls, Bengals, British Shorthairs and every moggy in between.'],
+            ['name' => 'Introductions and pet photos', 'slug' => 'show-us-your-cat', 'image' => 'hero', 'description' => 'Say hello and show us your pets. Photos, names, funny habits and new arrivals.'],
+            ['name' => 'Cats and kittens', 'slug' => 'kittens-and-new-cats', 'image' => 'kittens', 'description' => 'Bringing a kitten or rescue cat home: litter training, settling in, vaccinations and everyday cat life.'],
+            ['name' => 'Dogs and puppies', 'slug' => 'dogs-and-puppies', 'image' => 'dogs', 'description' => 'Puppy training, walks, recall, food and everyday dog life.'],
+            ['name' => 'Rabbits and small pets', 'slug' => 'rabbits-and-small-pets', 'image' => 'rabbits', 'description' => 'Rabbits, guinea pigs, hamsters, rats and ferrets: housing, diet and bonding.'],
+            ['name' => 'Birds, reptiles and fish', 'slug' => 'birds-reptiles-fish', 'image' => 'reptiles', 'description' => 'Aviaries, vivariums and tanks: set-ups, lighting, heating and diet.'],
+            ['name' => 'Health and behaviour', 'slug' => 'health-and-behaviour', 'image' => 'guide-insurance', 'description' => 'Fussy eating, anxiety, older pets and vet visits. Share what worked for you.'],
+            ['name' => 'Breeds', 'slug' => 'breeds', 'image' => 'pedigree', 'description' => 'Breeds of every kind, from Cockapoos and Maine Coons to Lionheads, plus every crossbreed in between.'],
             ['name' => 'Adoption and rescue', 'slug' => 'adoption-and-rescue', 'image' => 'rehoming', 'description' => 'Adopting, fostering, rescues you recommend and rehoming advice.'],
-            ['name' => 'Products and food', 'slug' => 'products-and-food', 'image' => 'products', 'description' => 'Food, litter, cat trees, carriers and toys. What is worth buying and what is not.'],
-            ['name' => 'Lost and found help', 'slug' => 'lost-and-found-help', 'image' => 'lost-found', 'description' => 'Tips for finding a missing cat and reuniting found cats. Post the cat itself as a free Lost & Found advert.'],
-            ['name' => 'Vets, sitters and services', 'slug' => 'vets-and-services', 'image' => 'services', 'description' => 'Recommend a vet, cattery, sitter or groomer near you in the UK or US.'],
+            ['name' => 'Products and food', 'slug' => 'products-and-food', 'image' => 'products', 'description' => 'Food, beds, hutches, tanks, toys and carriers. What is worth buying and what is not.'],
+            ['name' => 'Lost and found help', 'slug' => 'lost-and-found-help', 'image' => 'lost-found', 'description' => 'Tips for finding a missing pet and reuniting found pets. Post the pet itself as a free Lost & Found advert.'],
+            ['name' => 'Vets, sitters and services', 'slug' => 'vets-and-services', 'image' => 'services', 'description' => 'Recommend a vet, kennels, cattery, dog walker, sitter or groomer near you in the UK or US.'],
         ];
     }
 

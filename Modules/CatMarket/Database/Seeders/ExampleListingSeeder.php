@@ -7,7 +7,7 @@ namespace Modules\CatMarket\Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
-use Modules\CatMarket\Support\CatCatalog;
+use Modules\CatMarket\Support\PetCatalog;
 use Modules\CatMarket\Support\SiteImages;
 use Modules\Category\Models\Category;
 use Modules\Listing\Models\Listing;
@@ -86,12 +86,12 @@ class ExampleListingSeeder extends Seeder
 
     private function records(): array
     {
-        $kittens = CatCatalog::childSlug('kittens', 'Pedigree kittens');
-        $pedigree = CatCatalog::childSlug('pedigree-cats', 'Adult pedigree cats');
-        $products = CatCatalog::childSlug('cat-products', 'Cat trees & furniture');
-        $rehoming = CatCatalog::childSlug('cats-for-rehoming', 'Adult cats');
-        $lost = CatCatalog::childSlug('lost-and-found', 'Lost cats');
-        $sitting = CatCatalog::childSlug('cat-services', 'Cat sitting');
+        $kittens = PetCatalog::childSlug('cats', 'Pedigree cats & kittens');
+        $pedigree = PetCatalog::childSlug('cats', 'Pedigree cats & kittens');
+        $products = PetCatalog::childSlug('pet-products', 'Cat supplies');
+        $rehoming = PetCatalog::childSlug('cats', 'Cats for rehoming');
+        $lost = PetCatalog::childSlug('lost-and-found', 'Lost pets');
+        $sitting = PetCatalog::childSlug('pet-services', 'Pet sitting');
 
         return [
             [
@@ -99,14 +99,14 @@ class ExampleListingSeeder extends Seeder
                 'category' => $kittens, 'image' => 'example-ragdoll', 'featured' => true,
                 'country' => 'United Kingdom', 'city' => 'Leeds', 'lat' => 53.8008, 'lng' => -1.5491, 'price' => 950,
                 'description' => "Two beautiful Ragdoll kittens from our second litter, raised in the house with children and a calm older cat.\n\nThey leave at 13 weeks fully vaccinated, microchipped, flea and worm treated, with 4 weeks' free insurance and a kitten pack. Mum and dad can both be seen.\n\nViewing by appointment. A deposit is only taken after you have met the kittens.",
-                'fields' => ['seller_type' => CatCatalog::SELLER_REGISTERED_BREEDER, 'breed' => 'Ragdoll', 'date_of_birth' => now()->subWeeks(10)->toDateString(), 'sex' => 'Mixed litter', 'neutered' => 'Too young', 'vaccinations' => 'First vaccination', 'microchipped' => true, 'flea_worm_treated' => true, 'lifestyle' => 'Indoor only', 'good_with' => 'Children and other pets', 'ready_to_leave' => now()->addWeeks(3)->toDateString(), 'mother_seen' => true, 'registration' => 'GCCF'],
+                'fields' => ['seller_type' => PetCatalog::SELLER_REGISTERED_BREEDER, 'breed' => 'Ragdoll', 'date_of_birth' => now()->subWeeks(10)->toDateString(), 'sex' => 'Mixed litter', 'neutered' => 'Too young', 'vaccinations' => 'First vaccination', 'microchip' => 'Yes', 'flea_worm_treated' => true, 'good_with' => 'Children and other pets', 'ready_to_leave' => now()->addWeeks(3)->toDateString(), 'mother_seen' => true, 'registration' => 'GCCF'],
             ],
             [
                 'title' => 'Bengal girl, 2 years, TICA registered, needs a calm home',
                 'category' => $pedigree, 'image' => 'example-bengal',
                 'country' => 'United States', 'city' => 'Austin, TX', 'lat' => 30.2672, 'lng' => -97.7431, 'price' => 400,
                 'description' => "Luna is a spotted brown Bengal, spayed and up to date with her shots. She is very playful, loves her wheel and a window to watch birds.\n\nWe are moving overseas and cannot take her. Her cat tree, carrier and food come with her. Rehoming fee goes to her new vet costs if you need it back.",
-                'fields' => ['seller_type' => CatCatalog::SELLER_PRIVATE, 'breed' => 'Bengal', 'date_of_birth' => now()->subYears(2)->toDateString(), 'sex' => 'Female', 'neutered' => 'Yes', 'vaccinations' => 'Boosters up to date', 'microchipped' => true, 'flea_worm_treated' => true, 'lifestyle' => 'Indoor only', 'good_with' => 'Adults only', 'registration' => 'TICA'],
+                'fields' => ['seller_type' => PetCatalog::SELLER_PRIVATE, 'breed' => 'Bengal', 'date_of_birth' => now()->subYears(2)->toDateString(), 'sex' => 'Female', 'neutered' => 'Yes', 'vaccinations' => 'Boosters up to date', 'microchip' => 'Yes', 'flea_worm_treated' => true, 'good_with' => 'Adults only', 'registration' => 'TICA'],
             ],
             [
                 'title' => 'Large cat tree, 150 cm, grey, hammock and cave',
@@ -120,14 +120,14 @@ class ExampleListingSeeder extends Seeder
                 'category' => $rehoming, 'image' => 'rehoming', 'urgent' => true,
                 'country' => 'United Kingdom', 'city' => 'Edinburgh', 'lat' => 55.9533, 'lng' => -3.1883, 'price' => 0,
                 'description' => "Smokey is a neutered male who loves a lap and a sunny windowsill. He is house trained, fine with visitors and has always had outdoor access.\n\nMy new landlord does not allow pets, so I need to find him a home by the end of the month. Free to the right home, a home visit would be appreciated.",
-                'fields' => ['seller_type' => CatCatalog::SELLER_PRIVATE, 'breed' => 'Domestic shorthair (moggy)', 'date_of_birth' => now()->subYears(6)->toDateString(), 'sex' => 'Male', 'neutered' => 'Yes', 'vaccinations' => 'Boosters up to date', 'microchipped' => true, 'flea_worm_treated' => true, 'lifestyle' => 'Outdoor access', 'good_with' => 'Adults only'],
+                'fields' => ['seller_type' => PetCatalog::SELLER_PRIVATE, 'breed' => 'Domestic shorthair (moggy)', 'date_of_birth' => now()->subYears(6)->toDateString(), 'sex' => 'Male', 'neutered' => 'Yes', 'vaccinations' => 'Boosters up to date', 'health_evidence' => 'Vet records available to see', 'microchip' => 'Yes', 'flea_worm_treated' => true, 'good_with' => 'Adults only', 'rehoming_reason' => 'Moving to a rented flat that does not allow pets'],
             ],
             [
                 'title' => 'LOST: black and white cat, Ballard area',
                 'category' => $lost, 'image' => 'lost-found',
                 'country' => 'United States', 'city' => 'Seattle, WA', 'lat' => 47.6686, 'lng' => -122.3860, 'price' => 0,
                 'description' => "Our cat Oreo has not come home since Tuesday evening. He is black with a white chest, white paws and a small white patch on his nose. Friendly but nervous with strangers.\n\nPlease check sheds and garages. Message us any time with a sighting.",
-                'fields' => ['date_lost_found' => now()->subDays(2)->toDateString(), 'area_last_seen' => 'NW 65th St near the park, Ballard', 'colour_markings' => 'Black with white chest, paws and nose patch', 'microchip_status' => 'Yes', 'wearing_collar' => false],
+                'fields' => ['species' => 'Cat', 'date_lost_found' => now()->subDays(2)->toDateString(), 'area_last_seen' => 'NW 65th St near the park, Ballard', 'colour_markings' => 'Black with white chest, paws and nose patch', 'microchip_status' => 'Yes', 'wearing_collar' => false],
             ],
             [
                 'title' => 'Cat sitting visits, 2 a day, insured, Brooklyn',

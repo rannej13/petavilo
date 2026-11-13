@@ -16,7 +16,7 @@ class Guide extends Model
     use SoftDeletes;
 
     public const TYPES = [
-        'care' => 'Cat care',
+        'care' => 'Pet care',
         'breed' => 'Breed guides',
         'buying' => 'Adopting and buying',
         'comparison' => 'Product comparisons',

@@ -9,16 +9,16 @@
 @if($isFollowUp)
 <p>A quick reminder: your free listing on {{ $site }} is still waiting for you to claim it.</p>
 @else
-<p>{{ $site }} is a directory and marketplace just for cat owners in the UK and US. <strong>{{ $business->getAttribute('name') }}</strong> already has a free {{ $typeName }} listing@if($business->getAttribute('town')) in {{ $business->getAttribute('town') }}@endif, built from public business information.</p>
+<p>{{ $site }} is a directory and marketplace just for pet owners in the UK and US. <strong>{{ $business->getAttribute('name') }}</strong> already has a free {{ $typeName }} listing@if($business->getAttribute('town')) in {{ $business->getAttribute('town') }}@endif, built from public business information.</p>
 @endif
 <p><a href="{{ $listingUrl }}" style="color:#b24200">See your listing</a></p>
 <p>Claiming it is free and takes two minutes. Once claimed you can:</p>
 <ul style="padding-left:20px">
 <li>correct your phone, website and address</li>
 <li>add opening hours, services, prices and photos</li>
-<li>show your Cat Friendly accreditation</li>
+<li>show your accreditations</li>
 <li>get the Verified badge</li>
-<li>see how many cat owners viewed your page and clicked through</li>
+<li>see how many pet owners viewed your page and clicked through</li>
 </ul>
 <p style="margin:24px 0"><a href="{{ $claimUrl }}" style="background:#e85d04;color:#ffffff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold">Claim your free listing</a></p>
 <p style="color:#555">Optional paid upgrades put you at the top of your town's results and on our homepage, but nothing is required.</p>

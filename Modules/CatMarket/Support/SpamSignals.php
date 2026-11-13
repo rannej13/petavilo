@@ -111,6 +111,6 @@ final class SpamSignals
         $category = Category::query()->find($categoryId);
         $slug = (string) $category?->getAttribute('slug');
 
-        return Str::startsWith($slug, ['pedigree-cats', 'kittens-pedigree']);
+        return in_array(PetCatalog::leaf($slug)['kind'] ?? null, [PetCatalog::KIND_PEDIGREE, PetCatalog::KIND_LITTER], true);
     }
 }
