@@ -1,0 +1,11 @@
+{
+    "name": "PetTools",
+    "alias": "pettools",
+    "description": "Free pet tools: poison checker, food matcher, Pet Passport with health records, insurance organiser and emergency QR pass.",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\PetTools\\Providers\\PetToolsServiceProvider"
+    ],
+    "files": []
+}

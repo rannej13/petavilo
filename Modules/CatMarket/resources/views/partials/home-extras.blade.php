@@ -28,6 +28,21 @@
         </div>
     </section>
 @endif
+@if(\Illuminate\Support\Facades\Route::has('pettools.index'))
+    <section class="section">
+        <div class="stack">
+            <div class="row row--between">
+                <h2 class="title-section">Free pet tools</h2>
+                <a class="text-link" href="{{ route('pettools.index') }}">All tools</a>
+            </div>
+            <div class="grid grid--three">
+                <a href="{{ route('pettools.poison') }}" class="card"><div class="card__body stack stack--tight"><p class="text-eyebrow">Is it poisonous?</p><p class="title-card">Check food, plants and medicines for your pet</p></div></a>
+                <a href="{{ route('pettools.food') }}" class="card"><div class="card__body stack stack--tight"><p class="text-eyebrow">Food matcher</p><p class="title-card">What should my pet eat?</p></div></a>
+                <a href="{{ route('pettools.passport.about') }}" class="card"><div class="card__body stack stack--tight"><p class="text-eyebrow">Pet Passport</p><p class="title-card">Health records, insurance and an emergency QR pass</p></div></a>
+            </div>
+        </div>
+    </section>
+@endif
 <section class="section">
     <div class="grid grid--three">
         @if(\Illuminate\Support\Facades\Route::has('directory.index'))

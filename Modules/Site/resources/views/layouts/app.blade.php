@@ -222,6 +222,9 @@
                         <a href="{{ route('rescue.found-animal') }}" class="nav-list__item"><span>Found an animal?</span><x-ui.icon name="chevron-right"/></a>
                         <a href="{{ route('rescue.rescues') }}" class="nav-list__item"><span>Rescues</span><x-ui.icon name="chevron-right"/></a>
                     @endif
+                    @if(\Illuminate\Support\Facades\Route::has('pettools.index'))
+                        <a href="{{ route('pettools.index') }}" class="nav-list__item"><span>Free pet tools</span><x-ui.icon name="chevron-right"/></a>
+                    @endif
                     @if(\Illuminate\Support\Facades\Route::has('directory.index'))
                         <a href="{{ route('directory.index') }}" class="nav-list__item"><span>{{ __('catmarket::messages.directory') }}</span><x-ui.icon name="chevron-right"/></a>
                     @endif

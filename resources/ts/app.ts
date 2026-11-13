@@ -12,6 +12,7 @@ import { locationPicker } from './modules/location-picker';
 import { contactReveal, shareAction } from './modules/reveal';
 import { disclosureGroup, navigationDrawer, searchSuggest, stickyHeader } from './modules/navigation';
 import { installVideoCompressor } from './modules/video-compress';
+import { renderQrCodes } from './modules/qr-code';
 
 const behaviors: readonly Behavior<never>[] = [
     navigationDrawer,
@@ -41,6 +42,7 @@ const behaviors: readonly Behavior<never>[] = [
 
 function boot(): void {
     installVideoCompressor();
+    renderQrCodes();
     startBehaviors(behaviors);
 }
 
