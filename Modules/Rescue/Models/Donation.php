@@ -22,11 +22,12 @@ class Donation extends Model
 
     protected $table = 'rescue_donations';
 
-    protected $fillable = ['amount', 'fee_cover', 'currency', 'donor_name', 'message', 'is_anonymous'];
+    protected $fillable = ['amount', 'fee_cover', 'tip', 'currency', 'donor_name', 'message', 'is_anonymous'];
 
     protected $casts = [
         'amount' => 'decimal:2',
         'fee_cover' => 'decimal:2',
+        'tip' => 'decimal:2',
         'is_anonymous' => 'boolean',
         'paid_at' => 'datetime',
     ];
@@ -48,7 +49,17 @@ class Donation extends Model
 
     public function total(): float
     {
-        return (float) $this->getAttribute('amount') + (float) $this->getAttribute('fee_cover');
+        return (float) $this->getAttribute('amount') + (float) $this->getAttribute('fee_cover') + (float) $this->getAttribute('tip');
+    }
+
+    public function tipLabel(): string
+    {
+        return self::money((float) $this->getAttribute('tip'), (string) $this->getAttribute('currency'));
+    }
+
+    public function feeCoverLabel(): string
+    {
+        return self::money((float) $this->getAttribute('fee_cover'), (string) $this->getAttribute('currency'));
     }
 
     public function totalLabel(): string
@@ -83,6 +94,11 @@ class Donation extends Model
         return round($gross - $amount, 2);
     }
 
+    public static function tipFor(float $amount, int $percent): float
+    {
+        return round($amount * max(0, min(30, $percent)) / 100, 2);
+    }
+
     public static function money(float $value, string $currency): string
     {
         return ($currency === 'USD' ? '$' : '£').number_format($value, 2);
@@ -94,7 +110,7 @@ class Donation extends Model
 
         return [
             'count' => (clone $paid)->count(),
-            'sum' => (float) (clone $paid)->sum('amount') + (float) (clone $paid)->sum('fee_cover'),
+            'sum' => (float) (clone $paid)->sum('amount'),
             'currency' => $organisation->currency(),
         ];
     }

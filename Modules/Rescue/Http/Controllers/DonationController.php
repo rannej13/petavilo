@@ -26,6 +26,7 @@ class DonationController extends Controller
         $data = $request->validate([
             'amount' => ['required', 'numeric', 'min:'.config('rescue.donation_min', 2), 'max:'.config('rescue.donation_max', 5000)],
             'cover_fees' => ['nullable', 'boolean'],
+            'tip_percent' => ['nullable', 'integer', 'min:0', 'max:30'],
             'donor_name' => ['nullable', 'string', 'max:80'],
             'message' => ['nullable', 'string', 'max:300'],
             'is_anonymous' => ['nullable', 'boolean'],
@@ -38,6 +39,7 @@ class DonationController extends Controller
         $donation->fill([
             'amount' => $amount,
             'fee_cover' => $request->boolean('cover_fees') ? Donation::feeCoverFor($amount, $currency) : 0,
+            'tip' => Donation::tipFor($amount, (int) ($data['tip_percent'] ?? 0)),
             'currency' => $currency,
             'donor_name' => $data['donor_name'] ?? null,
             'message' => $data['message'] ?? null,

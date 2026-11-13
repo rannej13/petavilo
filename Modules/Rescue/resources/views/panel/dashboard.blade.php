@@ -28,12 +28,12 @@
         <section class="card"><div class="card__body stack stack--tight">
             <h2 class="card__title">Donations</h2>
             @if($organisation->acceptsDonations())
-                <p>Donations are on. People can donate from <a class="text-link" href="{{ route('rescue.show', $organisation->getAttribute('slug')) }}#donate">your rescue page</a>. Money goes to your own Stripe account and Stripe pays it out to your bank.</p>
+                <p>Donations are on. People can donate from <a class="text-link" href="{{ route('rescue.show', $organisation->getAttribute('slug')) }}#donate">your rescue page</a>. Stripe sends 100% of each donation to your own Stripe account automatically and pays it out to your bank. Card fees are covered by the donor or by us, never taken from the donation.</p>
                 <p class="text-muted">{{ $donationTotals['count'] }} {{ \Illuminate\Support\Str::plural('donation', $donationTotals['count']) }} so far, {{ \Modules\Rescue\Models\Donation::money($donationTotals['sum'], $donationTotals['currency']) }} in total.</p>
             @elseif(! $organisation->getAttribute('donations_enabled'))
                 <p class="text-muted">Donations have been paused for your rescue. Contact us if you think this is a mistake.</p>
             @else
-                <p class="text-muted">Take card donations on your rescue page. You connect your own Stripe account, so money goes straight to you. {{ config('catmarket.site_name') }} takes no cut. Stripe charges its normal card fee.</p>
+                <p class="text-muted">Take card donations on your rescue page. Connect your own Stripe account and Stripe sends you 100% of every donation. {{ config('catmarket.site_name') }} takes no cut; donors can add an optional tip to us separately.</p>
                 <form method="POST" action="{{ route('rescue.donations.connect') }}">
                     @csrf
                     <button type="submit" class="button button--primary">{{ $organisation->getAttribute('stripe_account_id') ? 'Continue Stripe set-up' : 'Set up donations with Stripe' }}</button>

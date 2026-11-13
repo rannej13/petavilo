@@ -6,7 +6,10 @@ namespace Modules\Rescue\Providers;
 
 use App\Support\SitemapRegistry;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Cashier\Events\WebhookReceived;
+use Modules\Rescue\Listeners\HandleDonationWebhook;
 use Modules\Rescue\Console\ReconcileDonationsCommand;
 use Modules\Rescue\Models\RescueOrganisation;
 
@@ -22,6 +25,8 @@ class RescueServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([ReconcileDonationsCommand::class]);
         }
+
+        Event::listen(WebhookReceived::class, [HandleDonationWebhook::class, 'handle']);
 
         $this->callAfterResolving(Schedule::class, static function (Schedule $schedule): void {
             $schedule->command('donations:reconcile')->everyTenMinutes();

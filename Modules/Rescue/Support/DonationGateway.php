@@ -70,23 +70,20 @@ final class DonationGateway
         $session = Cashier::stripe()->checkout->sessions->create([
             'mode' => 'payment',
             'submit_type' => 'donate',
-            'line_items' => [[
-                'quantity' => 1,
-                'price_data' => [
-                    'currency' => $currency,
-                    'unit_amount' => (int) round($donation->total() * 100),
-                    'product_data' => ['name' => 'Donation to '.(string) $organisation->getAttribute('name')],
-                ],
-            ]],
+            'line_items' => self::lineItems($donation, $organisation, $currency),
             'customer_email' => $donation->user?->email,
             'payment_intent_data' => [
-                'description' => 'Donation via '.(string) config('catmarket.site_name', 'Petavilo'),
+                'description' => 'Donation to '.(string) $organisation->getAttribute('name').' via '.(string) config('catmarket.site_name', 'Petavilo'),
+                'transfer_data' => [
+                    'destination' => (string) $organisation->getAttribute('stripe_account_id'),
+                    'amount' => (int) round((float) $donation->getAttribute('amount') * 100),
+                ],
                 'metadata' => ['purpose' => 'rescue_donation', 'donation_id' => (string) $donation->getKey()],
             ],
             'metadata' => ['purpose' => 'rescue_donation', 'donation_id' => (string) $donation->getKey()],
             'success_url' => route('rescue.donations.thanks', $donation->getKey()).'?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => route('rescue.show', $organisation->getAttribute('slug')),
-        ], ['stripe_account' => (string) $organisation->getAttribute('stripe_account_id')]);
+        ]);
 
         $donation->forceFill([
             'stripe_session_id' => (string) $session->id,
@@ -96,17 +93,47 @@ final class DonationGateway
         return (string) $session->url;
     }
 
+    private static function lineItems(Donation $donation, RescueOrganisation $organisation, string $currency): array
+    {
+        $site = (string) config('catmarket.site_name', 'Petavilo');
+        $items = [[
+            'quantity' => 1,
+            'price_data' => [
+                'currency' => $currency,
+                'unit_amount' => (int) round((float) $donation->getAttribute('amount') * 100),
+                'product_data' => ['name' => 'Donation to '.(string) $organisation->getAttribute('name'), 'description' => '100% goes to the rescue'],
+            ],
+        ]];
+
+        if ((float) $donation->getAttribute('fee_cover') > 0) {
+            $items[] = ['quantity' => 1, 'price_data' => [
+                'currency' => $currency,
+                'unit_amount' => (int) round((float) $donation->getAttribute('fee_cover') * 100),
+                'product_data' => ['name' => 'Card processing fee', 'description' => 'So the rescue receives the full donation'],
+            ]];
+        }
+
+        if ((float) $donation->getAttribute('tip') > 0) {
+            $items[] = ['quantity' => 1, 'price_data' => [
+                'currency' => $currency,
+                'unit_amount' => (int) round((float) $donation->getAttribute('tip') * 100),
+                'product_data' => ['name' => 'Optional tip to '.$site, 'description' => 'Keeps '.$site.' free for rescues'],
+            ]];
+        }
+
+        return $items;
+    }
+
     public static function sync(Donation $donation): void
     {
         $sessionId = (string) $donation->getAttribute('stripe_session_id');
-        $accountId = (string) $donation->getAttribute('stripe_account_id');
 
-        if ($sessionId === '' || $accountId === '') {
+        if ($sessionId === '') {
             return;
         }
 
         try {
-            $session = Cashier::stripe()->checkout->sessions->retrieve($sessionId, [], ['stripe_account' => $accountId]);
+            $session = Cashier::stripe()->checkout->sessions->retrieve($sessionId);
         } catch (Throwable) {
             return;
         }
