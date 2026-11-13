@@ -58,6 +58,11 @@ final class MonetisationConfig
             }
         }
 
+        try {
+            config(['catmarket.show_examples' => (bool) $settings->show_example_adverts]);
+        } catch (Throwable) {
+        }
+
         self::applyMail($settings);
     }
 

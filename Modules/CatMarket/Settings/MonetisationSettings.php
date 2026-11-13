@@ -8,6 +8,8 @@ use Spatie\LaravelSettings\Settings;
 
 class MonetisationSettings extends Settings
 {
+    public bool $show_example_adverts = true;
+
     public ?string $stripe_key;
 
     public ?string $stripe_secret;

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use Modules\CatMarket\Support\MonetisationConfig;
 use Throwable;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Pages\SettingsPage;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -38,6 +39,11 @@ class ManageMonetisationSettings extends SettingsPage
                 ->description('Shown on the contact, legal and help pages, and used as the reply address on claim invitations.')
                 ->schema([
                     TextInput::make('contact_email')->label('Contact email')->email()->placeholder('petavilo@outlook.com'),
+                ])->columns(1),
+            Section::make('Example adverts')
+                ->description('Three clearly labelled sample adverts that make the site look lived-in while it is new. Turn them off once you have enough real adverts. Turning them back on restores them.')
+                ->schema([
+                    Toggle::make('show_example_adverts')->label('Show example adverts'),
                 ])->columns(1),
             Section::make('Sending email')
                 ->description('Lets the site send sign-up, password reset and message emails. For Resend use host smtp.resend.com, port 587, username resend and your API key as the password.')
@@ -125,5 +131,7 @@ class ManageMonetisationSettings extends SettingsPage
         if ($email !== '') {
             \Modules\CatMarket\Support\ContactEmail::sync($email);
         }
+
+        \Modules\CatMarket\Support\ExampleAdverts::sync((bool) ($this->data['show_example_adverts'] ?? true));
     }
 }
