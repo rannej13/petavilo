@@ -60,9 +60,13 @@ class HomeController extends Controller
         if (class_exists(\Modules\Guide\Models\Guide::class)) {
             $guides = \Modules\Guide\Models\Guide::query()->published()->count();
 
-            if ($guides > 0) {
+            if ($guides >= 10) {
                 $stats[] = [number_format($guides), 'free pet guides'];
             }
+        }
+
+        if (class_exists(\Modules\PetTools\Support\ToxinLibrary::class)) {
+            $stats[] = [(string) count(\Modules\PetTools\Support\ToxinLibrary::all()), 'foods and plants in our poison checker'];
         }
 
         if ($userCount >= 500) {
