@@ -37,7 +37,21 @@ class NotificationMail extends Mailable implements ShouldQueue
                 'url' => (string) ($this->notification->getAttribute('action_url') ?: route('panel.notifications.index')),
                 'settingsUrl' => route('panel.profile.edit'),
                 'site' => (string) config('catmarket.site_name', config('app.name')),
+                'buttonLabel' => $this->buttonLabel(),
             ],
         );
+    }
+
+    private function buttonLabel(): string
+    {
+        $url = (string) $this->notification->getAttribute('action_url');
+
+        return match (true) {
+            str_contains($url, '/panel/promotions') => 'See bump and feature options',
+            str_contains($url, '/panel/my-listings') => 'Go to My adverts',
+            str_contains($url, '/panel/inbox') => 'Read the message',
+            str_contains($url, '/listings/') => 'View your advert',
+            default => 'Open '.(string) config('catmarket.site_name', config('app.name')),
+        };
     }
 }

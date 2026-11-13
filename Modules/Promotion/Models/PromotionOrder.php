@@ -94,7 +94,37 @@ class PromotionOrder extends Model
             ListingDirectory::bump([$listingId]);
         }
 
+        self::keepListingLive($listingId, $order->getAttribute('ends_at'));
+
         return $order;
+    }
+
+    private static function keepListingLive(int $listingId, mixed $until): void
+    {
+        try {
+            $listing = \Modules\Listing\Models\Listing::query()->find($listingId);
+
+            if ($listing === null || $until === null) {
+                return;
+            }
+
+            $until = Carbon::parse($until)->addDay();
+            $changes = [];
+
+            if ($listing->getAttribute('expires_at') === null || $listing->getAttribute('expires_at')->lt($until)) {
+                $changes['expires_at'] = $until;
+            }
+
+            if ($listing->statusValue() === 'expired') {
+                $changes['status'] = 'active';
+            }
+
+            if ($changes !== []) {
+                $listing->forceFill($changes)->saveQuietly();
+            }
+        } catch (\Throwable $exception) {
+            report($exception);
+        }
     }
 
     public static function countFreeRedemptionsThisMonth(int $userId, int $planId): int

@@ -3,6 +3,6 @@
 @if($body !== ''){!! $body !!}
 
 @endif
-Open {!! $site !!}: {!! $url !!}
+{!! $buttonLabel !!}: {!! $url !!}
 
 Turn off email notifications: {!! $settingsUrl !!}

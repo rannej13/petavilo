@@ -98,8 +98,8 @@ final class SiteEmails
             (int) $ownerId,
             UserNotification::TYPE_LISTING,
             'Your advert ends soon',
-            '"'.$listing->getAttribute('title').'" ends on '.($expires ? $expires->isoFormat('D MMMM') : 'soon').'. Renew it from My adverts if it is still available, or mark it sold.',
-            route('panel.listings.index'),
+            '"'.$listing->getAttribute('title').'" ends on '.($expires ? $expires->isoFormat('D MMMM') : 'soon').'. Still available? Bump it back to the top or feature it, and it stays live for as long as the boost runs. If it has sold, mark it sold so buyers stop messaging you.',
+            route('panel.promotions.index', ['listing' => $listing->getKey()]),
         );
     }
 
@@ -115,7 +115,7 @@ final class SiteEmails
             (int) $ownerId,
             UserNotification::TYPE_LISTING,
             'Your advert has ended',
-            '"'.$listing->getAttribute('title').'" is no longer showing. You can renew it from My adverts.',
+            '"'.$listing->getAttribute('title').'" is no longer showing. You can relist it for free from My adverts, or bump or feature it to bring it back at the top of the results.',
             route('panel.listings.index'),
         );
     }
