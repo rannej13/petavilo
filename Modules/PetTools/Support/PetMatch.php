@@ -129,7 +129,7 @@ final class PetMatch
                     break;
                 case 'kitten':
                     $longAlone ? $add(-1, 'Kittens get into mischief alone; two kittens keep each other company') : $add(1, 'Someone is around for a young kitten');
-                    in_array($years, ['Up to 5', '5 to 10', '10 to 15'], true) ? $add(-2, 'Cats often live 15 years or more') : $add(1, 'You can plan for a long-lived pet');
+                    in_array($years, ['Up to 5', '5 to 10'], true) ? $add(-2, 'Cats often live 15 years or more') : ($years === '10 to 15' ? $add(-1, 'Cats often live 15 years or more') : $add(1, 'You can plan for a long-lived pet'));
                     $smallKids ? $add(-1, 'Kittens scratch and need gentle handling, which is hard for under-5s') : null;
                     $severeAllergy ? $add(-5, 'Cat allergies are common and can be severe') : ($mildAllergy ? $add(-2, 'Spend time with cats before deciding: mild allergies can get worse') : null);
                     $lowBudget ? $add(-1, 'A cat usually costs about £70 a month') : null;
