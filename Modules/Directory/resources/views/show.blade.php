@@ -69,7 +69,7 @@
                 @endif
                 <ul class="welfare-list">
                     @if(filled($business->getAttribute('phone')))
-                        <li class="welfare-list__item"><span>{{ __('directory::messages.phone') }}</span><a class="text-link" href="tel:{{ preg_replace('/[^0-9+]/', '', (string) $business->getAttribute('phone')) }}">{{ $business->getAttribute('phone') }}</a></li>
+                        <li class="welfare-list__item"><span>{{ __('directory::messages.phone') }}</span><a class="text-link" href="{{ route('directory.out', [$business, 'phone']) }}" rel="nofollow">{{ $business->getAttribute('phone') }}</a></li>
                     @endif
                     @if($business->websiteUrl())
                         <li class="welfare-list__item"><span>{{ __('directory::messages.website') }}</span><a class="text-link" href="{{ route('directory.out', [$business, 'website']) }}" rel="noopener {{ $isPaid ? '' : 'nofollow' }}" target="_blank">{{ parse_url($business->websiteUrl(), PHP_URL_HOST) }}</a></li>

@@ -24,6 +24,21 @@
         </div>
         <div class="card__body stack stack--tight">
             <p class="text-meta">{{ __('directory::messages.completeness', ['percent' => $business->profileCompleteness()]) }} · {{ __('directory::messages.stats_line', ['views' => number_format((int) $business->getAttribute('view_count')), 'clicks' => number_format((int) $business->getAttribute('website_clicks'))]) }}</p>
+            @php $last30 = $business->statsForDays(30); @endphp
+            <div class="grid grid--stats">
+                <div class="stat-card"><span class="stat-card__value">{{ number_format($last30['views']) }}</span><span class="stat-card__label">Profile views</span></div>
+                <div class="stat-card"><span class="stat-card__value">{{ number_format($last30['website']) }}</span><span class="stat-card__label">Website visits</span></div>
+                <div class="stat-card"><span class="stat-card__value">{{ number_format($last30['booking']) }}</span><span class="stat-card__label">Booking clicks</span></div>
+                <div class="stat-card"><span class="stat-card__value">{{ number_format($last30['phone']) }}</span><span class="stat-card__label">Phone taps</span></div>
+            </div>
+            <p class="text-meta">Last 30 days, from people on Petavilo.</p>
+            @if($business->onPilot())
+                <div class="notice notice--accent">
+                    <p class="notice__title">Free {{ ucfirst((string) $business->getAttribute('pilot_tier')) }} until {{ $business->getAttribute('pilot_ends_at')->isoFormat('D MMMM YYYY') }}</p>
+                    <p>No commission, ever: you keep every booking. To keep {{ ucfirst((string) $business->getAttribute('pilot_tier')) }} after the trial, choose a plan before it ends.</p>
+                    <a href="{{ route('billing.membership.index') }}" class="button button--primary">See plans</a>
+                </div>
+            @endif
         </div>
         <form method="POST" action="{{ route('directory.panel.update', $business) }}" class="card__body stack" enctype="multipart/form-data">
             @csrf

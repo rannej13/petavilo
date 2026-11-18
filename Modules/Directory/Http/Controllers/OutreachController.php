@@ -76,11 +76,21 @@ class OutreachController extends Controller
 
     public function out(Business $business, string $kind): RedirectResponse
     {
+        if ($kind === 'phone') {
+            $number = preg_replace('/[^0-9+]/', '', (string) $business->getAttribute('phone'));
+            abort_if($number === '', 404);
+            Business::query()->whereKey($business->getKey())->increment('phone_clicks');
+            Business::recordStat((int) $business->getKey(), 'phone');
+
+            return redirect()->away('tel:'.$number);
+        }
+
         $url = $kind === 'booking' ? $business->bookingUrl() : $business->websiteUrl();
 
         abort_if($url === null, 404);
 
         Business::query()->whereKey($business->getKey())->increment('website_clicks');
+        Business::recordStat((int) $business->getKey(), $kind === 'booking' ? 'booking' : 'website');
 
         return redirect()->away($url);
     }

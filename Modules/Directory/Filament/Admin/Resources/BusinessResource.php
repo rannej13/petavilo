@@ -88,6 +88,7 @@ class BusinessResource extends Resource
                 IconColumn::make('is_verified')->boolean()->label('Verified'),
                 IconColumn::make('is_published')->boolean()->label('Live'),
                 TextColumn::make('view_count')->label('Views')->sortable(),
+                TextColumn::make('pilot_ends_at')->label('Free trial ends')->date('j M Y')->sortable()->toggleable(),
                 TextColumn::make('website_clicks')->label('Clicks')->sortable()->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('email')->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('invited_at')->label('Invited')->since()->sortable()->toggleable(isToggledHiddenByDefault: true),
@@ -106,9 +107,43 @@ class BusinessResource extends Resource
                         true: fn (Builder $query): Builder => $query->whereNotNull('owner_user_id'),
                         false: fn (Builder $query): Builder => $query->whereNull('owner_user_id'),
                     ),
+                Filter::make('on_pilot')->label('On free trial')
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('pilot_tier')->where('pilot_ends_at', '>', now())),
                 Filter::make('invited')->label('Invited by email')->query(fn (Builder $query): Builder => $query->whereNotNull('invited_at')),
             ])
             ->actions([
+                Action::make('startPilot')
+                    ->label('Free trial')
+                    ->icon('heroicon-o-gift')
+                    ->color('success')
+                    ->visible(fn (Business $record): bool => $record->isClaimed() && ! $record->onPilot())
+                    ->form([
+                        \Filament\Forms\Components\Select::make('tier')->options(['premium' => 'Premium', 'plus' => 'Plus'])->default('premium')->required(),
+                        \Filament\Forms\Components\Select::make('months')->options([1 => '1 month', 2 => '2 months', 3 => '3 months', 6 => '6 months'])->default(3)->required(),
+                    ])
+                    ->modalDescription('The owner gets the paid features free for this long, with reminders 14 and 3 days before it ends. Then it drops back to whatever they pay for.')
+                    ->action(function (Business $record, array $data): void {
+                        $record->startPilot((string) $data['tier'], (int) $data['months']);
+
+                        try {
+                            \Modules\Notification\Models\UserNotification::publish(
+                                (int) $record->getAttribute('owner_user_id'),
+                                \Modules\Notification\Models\UserNotification::TYPE_PROMOTION,
+                                'Free '.ucfirst((string) $data['tier']).' for '.$record->getAttribute('name'),
+                                'You have '.ucfirst((string) $data['tier']).' free until '.$record->getAttribute('pilot_ends_at')->isoFormat('D MMMM YYYY').': more photos, an offer for new clients and top placement. Your dashboard shows views, clicks and calls from Petavilo.',
+                                route('directory.panel.index'),
+                            );
+                        } catch (\Throwable $exception) {
+                            report($exception);
+                        }
+                    }),
+                Action::make('endPilot')
+                    ->label('End trial')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('gray')
+                    ->requiresConfirmation()
+                    ->visible(fn (Business $record): bool => $record->onPilot())
+                    ->action(fn (Business $record) => $record->endPilot()),
                 Action::make('verifyAccreditation')
                     ->label('Accreditation OK')
                     ->icon('heroicon-o-check-badge')

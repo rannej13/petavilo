@@ -19,6 +19,7 @@ class DirectoryServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(module_path('Directory', 'config/directory.php'), 'directory');
 
         $this->callAfterResolving(Schedule::class, static function (Schedule $schedule): void {
+            $schedule->command('directory:pilots')->name('directory:pilots')->dailyAt('09:20')->withoutOverlapping();
             $schedule->command('directory:import-places')->name('directory:import-places')->hourly()->withoutOverlapping();
             $schedule->command('directory:invite')->name('directory:invite')->weekdays()->at('10:07')->withoutOverlapping()
                 ->when(static fn (): bool => (bool) config('directory.outreach.enabled', false));
@@ -33,7 +34,7 @@ class DirectoryServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom(module_path('Directory', 'lang'), 'directory');
 
         if ($this->app->runningInConsole()) {
-            $this->commands([ImportPlacesCommand::class, DedupeBusinessesCommand::class, SendClaimInvitesCommand::class]);
+            $this->commands([\Modules\Directory\Console\PilotRemindersCommand::class, ImportPlacesCommand::class, DedupeBusinessesCommand::class, SendClaimInvitesCommand::class]);
         }
 
         SitemapRegistry::register(static fn (): array => [

@@ -56,6 +56,9 @@ class Business extends Model
         'longitude' => 'decimal:7',
         'invited_at' => 'datetime',
         'unsubscribed_at' => 'datetime',
+        'pilot_started_at' => 'datetime',
+        'pilot_ends_at' => 'datetime',
+        'pilot_reminded_at' => 'datetime',
     ];
 
     protected static function booted(): void
@@ -177,6 +180,90 @@ class Business extends Model
             'tier' => $tier,
             'tier_rank' => self::TIERS[$tier],
         ]);
+
+        // A free pilot keeps its tier while it runs, unless the owner pays for a higher one.
+        static::query()
+            ->where('owner_user_id', $userId)
+            ->whereNotNull('pilot_tier')
+            ->where('pilot_ends_at', '>', now())
+            ->get()
+            ->each(static function (self $business) use ($tier): void {
+                $pilot = (string) $business->getAttribute('pilot_tier');
+
+                if ((self::TIERS[$pilot] ?? 1) > self::TIERS[$tier]) {
+                    static::query()->whereKey($business->getKey())->update(['tier' => $pilot, 'tier_rank' => self::TIERS[$pilot]]);
+                }
+            });
+    }
+
+    public function onPilot(): bool
+    {
+        $ends = $this->getAttribute('pilot_ends_at');
+
+        return filled($this->getAttribute('pilot_tier')) && $ends !== null && $ends->isFuture();
+    }
+
+    public function startPilot(string $tier, int $months): void
+    {
+        $tier = in_array($tier, ['plus', 'premium'], true) ? $tier : 'premium';
+        $months = max(1, min(12, $months));
+        $current = self::TIERS[(string) ($this->getAttribute('tier') ?: 'basic')] ?? 1;
+
+        $this->forceFill([
+            'pilot_tier' => $tier,
+            'pilot_started_at' => now(),
+            'pilot_ends_at' => now()->addMonthsNoOverflow($months)->endOfDay(),
+            'pilot_reminded_at' => null,
+            'tier' => self::TIERS[$tier] > $current ? $tier : $this->getAttribute('tier'),
+        ])->save();
+    }
+
+    public function endPilot(): void
+    {
+        $this->forceFill(['pilot_tier' => null, 'pilot_ends_at' => now(), 'pilot_reminded_at' => null])->save();
+        $ownerId = $this->getAttribute('owner_user_id');
+
+        if ($ownerId !== null && class_exists(\App\Support\MembershipDirectory::class)) {
+            self::syncTierForOwner((int) $ownerId, \App\Support\MembershipDirectory::directoryTierFor((int) $ownerId));
+        } else {
+            $this->forceFill(['tier' => 'basic'])->save();
+        }
+    }
+
+    public static function recordStat(int $businessId, string $column): void
+    {
+        if (! in_array($column, ['views', 'website', 'booking', 'phone'], true)) {
+            return;
+        }
+
+        try {
+            $day = now()->toDateString();
+            $updated = \Illuminate\Support\Facades\DB::table('business_stat_days')->where('business_id', $businessId)->where('day', $day)->increment($column);
+
+            if ($updated === 0) {
+                \Illuminate\Support\Facades\DB::table('business_stat_days')->insertOrIgnore(['business_id' => $businessId, 'day' => $day, $column => 1]);
+            }
+        } catch (\Throwable) {
+        }
+    }
+
+    /**
+     * @return array{views: int, website: int, booking: int, phone: int}
+     */
+    public function statsForDays(int $days = 30): array
+    {
+        $row = \Illuminate\Support\Facades\DB::table('business_stat_days')
+            ->where('business_id', $this->getKey())
+            ->where('day', '>=', now()->subDays($days - 1)->toDateString())
+            ->selectRaw('COALESCE(SUM(views),0) as views, COALESCE(SUM(website),0) as website, COALESCE(SUM(booking),0) as booking, COALESCE(SUM(phone),0) as phone')
+            ->first();
+
+        return [
+            'views' => (int) ($row->views ?? 0),
+            'website' => (int) ($row->website ?? 0),
+            'booking' => (int) ($row->booking ?? 0),
+            'phone' => (int) ($row->phone ?? 0),
+        ];
     }
 
     public static function claimedOwnerIds(): array
@@ -209,6 +296,7 @@ class Business extends Model
     public function trackView(): void
     {
         static::query()->whereKey($this->getKey())->increment('view_count');
+        self::recordStat((int) $this->getKey(), 'views');
     }
 
     public function updateFromOwner(array $data): void
