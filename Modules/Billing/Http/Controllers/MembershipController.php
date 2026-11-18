@@ -42,20 +42,21 @@ class MembershipController extends Controller
         }
 
         $user = $request->user();
-        \Modules\Billing\Support\StripeCustomer::heal($user);
-        $type = (string) $definition['type'];
-        $priceId = (string) MembershipCatalog::priceIdFor($definition, $currency);
-        $current = $user->subscription($type);
-
-        if ($current !== null && $current->valid()) {
-            if (! $current->hasPrice($priceId)) {
-                $current->swap($priceId);
-            }
-
-            return redirect()->route('billing.membership.index')->with('success', __('billing::messages.membership_updated'));
-        }
 
         try {
+            \Modules\Billing\Support\StripeCustomer::heal($user);
+            $type = (string) $definition['type'];
+            $priceId = (string) MembershipCatalog::priceIdFor($definition, $currency);
+            $current = $user->subscription($type);
+
+            if ($current !== null && $current->valid()) {
+                if (! $current->hasPrice($priceId)) {
+                    $current->swap($priceId);
+                }
+
+                return redirect()->route('billing.membership.index')->with('success', __('billing::messages.membership_updated'));
+            }
+
             return $user->newSubscription($type, $priceId)->checkout([
                 'success_url' => route('billing.membership.index').'?welcome=1',
                 'cancel_url' => route('billing.membership.index'),

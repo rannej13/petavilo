@@ -111,6 +111,54 @@ class ManageMonetisationSettings extends SettingsPage
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('checkStripe')
+                ->label('Check Stripe connection')
+                ->action(function (): void {
+                    MonetisationConfig::apply();
+                    $lines = [];
+
+                    try {
+                        $stripe = \Laravel\Cashier\Cashier::stripe();
+                        $account = $stripe->accounts->retrieve();
+                        $mode = str_starts_with((string) config('cashier.secret'), 'sk_live') ? 'LIVE' : 'TEST';
+                        $lines[] = $mode.' mode, account '.($account->settings->dashboard->display_name ?? $account->id).'.';
+                        $lines[] = 'Card payments: '.($account->charges_enabled ? 'on' : 'OFF').'. Payouts: '.($account->payouts_enabled ? 'on' : 'OFF').'.';
+
+                        foreach (config('billing.memberships', []) as $key => $plan) {
+                            foreach (['price_id' => 'GBP', 'price_id_usd' => 'USD'] as $field => $label) {
+                                $id = (string) ($plan[$field] ?? '');
+
+                                if ($id === '') {
+                                    $lines[] = $key.' '.$label.': no price ID';
+                                    continue;
+                                }
+
+                                try {
+                                    $price = $stripe->prices->retrieve($id);
+                                    $lines[] = $key.' '.$label.': OK ('.strtoupper($price->currency).' '.number_format($price->unit_amount / 100, 2).')';
+                                } catch (Throwable $exception) {
+                                    $lines[] = $key.' '.$label.': '.mb_substr($exception->getMessage(), 0, 120);
+                                }
+                            }
+                        }
+
+                        $user = auth()->user();
+
+                        if ($user !== null && $user->hasStripeId()) {
+                            try {
+                                $user->asStripeCustomer();
+                                $lines[] = 'Your Stripe customer: OK.';
+                            } catch (Throwable $exception) {
+                                \Modules\Billing\Support\StripeCustomer::heal($user);
+                                $lines[] = 'Your old Stripe customer was not found ('.mb_substr($exception->getMessage(), 0, 100).') and has been cleared.';
+                            }
+                        }
+
+                        Notification::make()->title('Stripe connection')->body(implode("\n", $lines))->success()->persistent()->send();
+                    } catch (Throwable $exception) {
+                        Notification::make()->title('Stripe connection failed')->body(mb_substr($exception->getMessage(), 0, 400))->danger()->persistent()->send();
+                    }
+                }),
             Action::make('sendTestEmail')
                 ->label('Send test email')
                 ->action(function (): void {
