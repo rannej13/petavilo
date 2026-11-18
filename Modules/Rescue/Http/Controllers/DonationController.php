@@ -20,7 +20,13 @@ class DonationController extends Controller
     {
         $organisation = RescueOrganisation::query()->where('slug', $slug)->firstOrFail();
 
-        abort_unless($organisation->acceptsDonations() && DonationGateway::isConfigured(), 404);
+        if (DonationGateway::isConfigured()) {
+            DonationGateway::forgetIfMissing($organisation);
+        }
+
+        if (! $organisation->acceptsDonations() || ! DonationGateway::isConfigured()) {
+            return redirect()->route('rescue.show', $slug)->with('error', 'This rescue cannot take online donations right now. Please try again later.');
+        }
         SpamGuard::check($request, 'amount');
 
         $data = $request->validate([

@@ -42,6 +42,7 @@ class MembershipController extends Controller
         }
 
         $user = $request->user();
+        \Modules\Billing\Support\StripeCustomer::heal($user);
         $type = (string) $definition['type'];
         $priceId = (string) MembershipCatalog::priceIdFor($definition, $currency);
         $current = $user->subscription($type);
@@ -54,15 +55,25 @@ class MembershipController extends Controller
             return redirect()->route('billing.membership.index')->with('success', __('billing::messages.membership_updated'));
         }
 
-        return $user->newSubscription($type, $priceId)->checkout([
-            'success_url' => route('billing.membership.index').'?welcome=1',
-            'cancel_url' => route('billing.membership.index'),
-            'metadata' => ['membership' => (string) $definition['key']],
-        ]);
+        try {
+            return $user->newSubscription($type, $priceId)->checkout([
+                'success_url' => route('billing.membership.index').'?welcome=1',
+                'cancel_url' => route('billing.membership.index'),
+                'metadata' => ['membership' => (string) $definition['key']],
+            ]);
+        } catch (\Throwable $exception) {
+            report($exception);
+            $isAdmin = method_exists($user, 'hasRole') && $user->hasRole('admin');
+
+            return redirect()->route('billing.membership.index')->with('error', $isAdmin
+                ? 'Stripe said: '.mb_substr($exception->getMessage(), 0, 300)
+                : __('billing::messages.payments_unavailable'));
+        }
     }
 
     public function portal(Request $request): Response
     {
+        \Modules\Billing\Support\StripeCustomer::heal($request->user());
         abort_unless($request->user()->hasStripeId(), 404);
 
         return $request->user()->redirectToBillingPortal(route('billing.membership.index'));

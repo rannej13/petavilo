@@ -25,6 +25,7 @@ final class PaymentGateway
 
     public static function promotionCheckout(User $user, PromotionPlan $plan, int $listingId): Checkout
     {
+        StripeCustomer::heal($user);
         $listingCurrency = (string) (ListingDirectory::find($listingId)['currency'] ?? $plan->getAttribute('currency'));
         $currency = $plan->currencyFor($listingCurrency);
         $amount = (int) round($plan->priceFor($listingCurrency) * 100);

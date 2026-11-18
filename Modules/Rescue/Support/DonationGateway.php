@@ -20,6 +20,7 @@ final class DonationGateway
     public static function onboardingUrl(RescueOrganisation $organisation, string $email): string
     {
         $stripe = Cashier::stripe();
+        self::forgetIfMissing($organisation);
         $accountId = (string) $organisation->getAttribute('stripe_account_id');
 
         if ($accountId === '') {
@@ -45,6 +46,18 @@ final class DonationGateway
         ])->url;
     }
 
+    /**
+     * Accounts connected while the site used test keys don't exist in live mode.
+     */
+    public static function forgetIfMissing(RescueOrganisation $organisation): void
+    {
+        if ((string) $organisation->getAttribute('stripe_account_id') === '') {
+            return;
+        }
+
+        self::refreshAccount($organisation);
+    }
+
     public static function refreshAccount(RescueOrganisation $organisation): void
     {
         $accountId = (string) $organisation->getAttribute('stripe_account_id');
@@ -55,7 +68,11 @@ final class DonationGateway
 
         try {
             $account = Cashier::stripe()->accounts->retrieve($accountId);
-        } catch (Throwable) {
+        } catch (Throwable $exception) {
+            if (\Modules\Billing\Support\StripeCustomer::isMissing($exception)) {
+                $organisation->forceFill(['stripe_account_id' => null, 'payouts_ready' => false])->save();
+            }
+
             return;
         }
 
