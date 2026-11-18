@@ -46,6 +46,12 @@ class GeneralSettings extends Settings
 
     public ?string $facebook_client_secret;
 
+    public bool $enable_microsoft_login = false;
+
+    public ?string $microsoft_client_id = null;
+
+    public ?string $microsoft_client_secret = null;
+
     public bool $enable_apple_login;
 
     public ?string $apple_client_id;

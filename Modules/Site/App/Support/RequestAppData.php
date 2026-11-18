@@ -58,6 +58,9 @@ final class RequestAppData
             'facebook_login_enabled' => (bool) config('services.facebook.enabled', false),
             'facebook_client_id' => $fallbackFacebookClientId,
             'facebook_client_secret' => $fallbackFacebookClientSecret,
+            'microsoft_login_enabled' => (bool) config('services.microsoft.enabled', false),
+            'microsoft_client_id' => config('services.microsoft.client_id'),
+            'microsoft_client_secret' => config('services.microsoft.client_secret'),
             'apple_login_enabled' => (bool) config('services.apple.enabled', false),
             'apple_client_id' => $fallbackAppleClientId,
             'apple_client_secret' => $fallbackAppleClientSecret,
@@ -102,6 +105,9 @@ final class RequestAppData
                 'facebook_login_enabled' => (bool) ($settings->enable_facebook_login ?? false),
                 'facebook_client_id' => $facebookClientId !== '' ? $facebookClientId : null,
                 'facebook_client_secret' => $facebookClientSecret !== '' ? $facebookClientSecret : null,
+                'microsoft_login_enabled' => (bool) ($settings->enable_microsoft_login ?? false),
+                'microsoft_client_id' => trim((string) ($settings->microsoft_client_id ?? '')) ?: config('services.microsoft.client_id'),
+                'microsoft_client_secret' => trim((string) ($settings->microsoft_client_secret ?? '')) ?: config('services.microsoft.client_secret'),
                 'apple_login_enabled' => (bool) ($settings->enable_apple_login ?? false),
                 'apple_client_id' => $appleClientId !== '' ? $appleClientId : null,
                 'apple_client_secret' => $appleClientSecret !== '' ? $appleClientSecret : null,
@@ -134,6 +140,11 @@ final class RequestAppData
             'services.facebook.client_secret' => $generalSettings['facebook_client_secret'],
             'services.facebook.redirect' => route('auth.social.callback', ['provider' => 'facebook'], absolute: true),
             'services.facebook.enabled' => (bool) $generalSettings['facebook_login_enabled'],
+            'services.microsoft.client_id' => $generalSettings['microsoft_client_id'] ?? null,
+            'services.microsoft.client_secret' => $generalSettings['microsoft_client_secret'] ?? null,
+            'services.microsoft.redirect' => route('auth.social.callback', ['provider' => 'microsoft'], absolute: true),
+            'services.microsoft.tenant' => config('services.microsoft.tenant', 'common') ?: 'common',
+            'services.microsoft.enabled' => (bool) ($generalSettings['microsoft_login_enabled'] ?? false),
             'services.apple.client_id' => $generalSettings['apple_client_id'],
             'services.apple.client_secret' => $generalSettings['apple_client_secret'],
             'services.apple.redirect' => route('auth.social.callback', ['provider' => 'apple'], absolute: true),
@@ -143,6 +154,10 @@ final class RequestAppData
             'app.default_country_code' => $generalSettings['default_country_code'] ?? '+90',
             'app.default_country_iso2' => CountryCodeManager::iso2FromCountryCode($generalSettings['default_country_code'] ?? '+90') ?? 'TR',
         ]);
+
+        if (class_exists(\Modules\CatMarket\Support\MonetisationConfig::class)) {
+            \Modules\CatMarket\Support\MonetisationConfig::applyFromAddress();
+        }
     }
 
     private function normalizeCurrencies(array $currencies): array

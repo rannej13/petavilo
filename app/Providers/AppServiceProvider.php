@@ -28,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
 
         Event::listen(function (SocialiteWasCalled $event): void {
             $event->extendSocialite('apple', Provider::class);
+            $event->extendSocialite('microsoft', \SocialiteProviders\Microsoft\Provider::class);
         });
 
         $availableLocales = config('app.available_locales', ['en']);

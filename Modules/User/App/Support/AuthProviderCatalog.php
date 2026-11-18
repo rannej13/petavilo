@@ -14,6 +14,11 @@ class AuthProviderCatalog
             'login_label' => 'Sign in with Google',
             'register_label' => 'Create account with Google',
         ],
+        'microsoft' => [
+            'label' => 'Microsoft',
+            'login_label' => 'Sign in with Microsoft',
+            'register_label' => 'Create account with Microsoft',
+        ],
         'apple' => [
             'label' => 'Apple',
             'login_label' => 'Sign in with Apple',

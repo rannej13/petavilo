@@ -30,6 +30,7 @@
         "nwidart/laravel-modules": "^13.0",
         "pxlrbt/filament-activity-log": "^3.1",
         "socialiteproviders/apple": "^5.9",
+        "socialiteproviders/microsoft": "^4.10",
         "spatie/laravel-model-states": "^2.14.2",
         "spatie/laravel-permission": "^8.3",
         "spatie/laravel-settings": "^3.7",

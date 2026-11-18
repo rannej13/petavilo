@@ -46,6 +46,14 @@ return [
         'enabled' => env('ENABLE_APPLE_LOGIN', false),
     ],
 
+    'microsoft' => [
+        'client_id' => env('MICROSOFT_CLIENT_ID'),
+        'client_secret' => env('MICROSOFT_CLIENT_SECRET'),
+        'redirect' => env('MICROSOFT_REDIRECT_URI', '/auth/social/microsoft/callback'),
+        'tenant' => env('MICROSOFT_TENANT_ID', 'common'),
+        'enabled' => env('ENABLE_MICROSOFT_LOGIN', false),
+    ],
+
     'google_maps' => [
         'api_key' => env('GOOGLE_MAPS_API_KEY'),
     ],

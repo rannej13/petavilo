@@ -66,6 +66,24 @@ final class MonetisationConfig
         self::applyMail($settings);
     }
 
+    /**
+     * The address set under Payments and ads > Sending email must win over the
+     * older "sender email" in General settings, because it is the one verified
+     * with the email provider.
+     */
+    public static function applyFromAddress(): void
+    {
+        try {
+            $settings = app(MonetisationSettings::class);
+            $from = trim((string) ($settings->mail_from_address ?: ''));
+
+            if ($from !== '' && trim((string) ($settings->mail_host ?? '')) !== '') {
+                config(['mail.from.address' => $from]);
+            }
+        } catch (Throwable) {
+        }
+    }
+
     private static function applyMail(MonetisationSettings $settings): void
     {
         $host = trim((string) ($settings->mail_host ?? ''));

@@ -61,6 +61,9 @@ class ManageGeneralSettings extends SettingsPage
             'enable_facebook_login' => (bool) ($data['enable_facebook_login'] ?? $defaults['enable_facebook_login']),
             'facebook_client_id' => $data['facebook_client_id'] ?? null,
             'facebook_client_secret' => $data['facebook_client_secret'] ?? null,
+            'enable_microsoft_login' => (bool) ($data['enable_microsoft_login'] ?? false),
+            'microsoft_client_id' => $data['microsoft_client_id'] ?? null,
+            'microsoft_client_secret' => $data['microsoft_client_secret'] ?? null,
             'enable_apple_login' => (bool) ($data['enable_apple_login'] ?? $defaults['enable_apple_login']),
             'apple_client_id' => $data['apple_client_id'] ?? null,
             'apple_client_secret' => $data['apple_client_secret'] ?? null,
@@ -163,6 +166,7 @@ class ManageGeneralSettings extends SettingsPage
                     ->helperText('Required to enable map fields in listing forms.'),
                 Toggle::make('enable_google_login')
                     ->label('Google Login Enabled')
+                    ->helperText('Authorised redirect URI in Google Cloud: '.url('/auth/social/google/callback'))
                     ->default($defaults['enable_google_login']),
                 TextInput::make('google_client_id')
                     ->label('Google Client ID')
@@ -170,6 +174,20 @@ class ManageGeneralSettings extends SettingsPage
                     ->maxLength(255),
                 TextInput::make('google_client_secret')
                     ->label('Google Client Secret')
+                    ->password()
+                    ->revealable()
+                    ->nullable()
+                    ->maxLength(255),
+                Toggle::make('enable_microsoft_login')
+                    ->label('Microsoft Login Enabled')
+                    ->helperText('Works with personal Outlook/Hotmail accounts and work or school accounts. Redirect URI: '.url('/auth/social/microsoft/callback'))
+                    ->default(false),
+                TextInput::make('microsoft_client_id')
+                    ->label('Microsoft Application (client) ID')
+                    ->nullable()
+                    ->maxLength(255),
+                TextInput::make('microsoft_client_secret')
+                    ->label('Microsoft Client Secret (the secret Value)')
                     ->password()
                     ->revealable()
                     ->nullable()
@@ -223,6 +241,7 @@ class ManageGeneralSettings extends SettingsPage
             'enable_google_maps' => false,
             'enable_google_login' => false,
             'enable_facebook_login' => false,
+            'enable_microsoft_login' => false,
             'enable_apple_login' => false,
         ];
     }
