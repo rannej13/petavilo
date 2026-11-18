@@ -41,4 +41,11 @@
     <div class="field"><label class="field__label" for="notes">Notes</label><textarea id="notes" name="notes" class="textarea" rows="3" maxlength="3000">{{ $v('notes') }}</textarea></div>
     <div class="row"><button type="submit" class="button button--primary">Save litter</button></div>
 </div></form>
+
+@if($litter->exists)
+    <form method="POST" action="{{ route('breeder.litters.destroy', $litter->getKey()) }}" class="row" data-confirm="Delete {{ $litter->getAttribute('name') }} with all its weights, records and handover links? This can't be undone.">
+        @csrf @method('DELETE')
+        <button type="submit" class="button button--ghost">Delete this litter</button>
+    </form>
+@endif
 @endsection

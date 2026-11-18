@@ -17,11 +17,13 @@ Route::middleware('web')->group(function (): void {
         Route::post('/animals', [BreederController::class, 'storeAnimal'])->name('animals.store');
         Route::get('/animals/{animal}/edit', [BreederController::class, 'editAnimal'])->whereNumber('animal')->name('animals.edit');
         Route::put('/animals/{animal}', [BreederController::class, 'updateAnimal'])->whereNumber('animal')->name('animals.update');
+        Route::delete('/animals/{animal}', [BreederController::class, 'destroyAnimal'])->whereNumber('animal')->name('animals.destroy');
         Route::get('/litters/new', [BreederController::class, 'createLitter'])->name('litters.create');
         Route::post('/litters', [BreederController::class, 'storeLitter'])->name('litters.store');
         Route::get('/litters/{litter}', [BreederController::class, 'showLitter'])->whereNumber('litter')->name('litters.show');
         Route::get('/litters/{litter}/edit', [BreederController::class, 'editLitter'])->whereNumber('litter')->name('litters.edit');
         Route::put('/litters/{litter}', [BreederController::class, 'updateLitter'])->whereNumber('litter')->name('litters.update');
+        Route::delete('/litters/{litter}', [BreederController::class, 'destroyLitter'])->whereNumber('litter')->name('litters.destroy');
         Route::post('/litters/{litter}/offspring', [BreederController::class, 'addOffspring'])->whereNumber('litter')->name('offspring.add');
         Route::post('/litters/{litter}/weights', [BreederController::class, 'storeWeights'])->whereNumber('litter')->name('weights.store');
         Route::post('/litters/{litter}/records', [BreederController::class, 'storeRecord'])->whereNumber('litter')->name('records.store');
@@ -30,6 +32,7 @@ Route::middleware('web')->group(function (): void {
         Route::get('/offspring/{offspring}/pack', [BreederController::class, 'pack'])->whereNumber('offspring')->name('pack');
         Route::post('/waitlist', [BreederController::class, 'storeWaitlist'])->name('waitlist.store');
         Route::put('/waitlist/{entry}', [BreederController::class, 'updateWaitlist'])->whereNumber('entry')->name('waitlist.update');
+        Route::delete('/waitlist/{entry}', [BreederController::class, 'destroyWaitlist'])->whereNumber('entry')->name('waitlist.destroy');
         Route::get('/register', [BreederController::class, 'register'])->name('register');
         Route::get('/register.csv', [BreederController::class, 'registerCsv'])->name('register.csv');
     });

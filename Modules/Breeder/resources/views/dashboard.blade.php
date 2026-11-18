@@ -74,6 +74,10 @@
                                     </select>
                                     <noscript><button type="submit" class="button button--ghost button--small">Save</button></noscript>
                                 </form>
+                                <form method="POST" action="{{ route('breeder.waitlist.destroy', $entry->getKey()) }}" data-confirm="Remove {{ $entry->getAttribute('name') }} from your waiting list?">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="text-link" style="background: none; border: 0; padding: 0; font: inherit; cursor: pointer">Remove</button>
+                                </form>
                             </td>
                         </tr>
                     @endforeach

@@ -64,6 +64,15 @@ class BreederController extends Controller
         return redirect()->route('breeder.dashboard')->with('success', 'Saved.');
     }
 
+    public function destroyAnimal(Request $request, int $animal): RedirectResponse
+    {
+        $record = $this->ownAnimal($request, $animal);
+        $name = $record->getAttribute('name');
+        $record->delete();
+
+        return redirect()->route('breeder.dashboard')->with('success', $name.' deleted. Litters that used this dam or sire keep their other details.');
+    }
+
     // Litters
 
     public function createLitter(Request $request): View
@@ -98,6 +107,22 @@ class BreederController extends Controller
         $record->fill($this->litterData($request))->save();
 
         return redirect()->route('breeder.litters.show', $record->getKey())->with('success', 'Saved.');
+    }
+
+    public function destroyLitter(Request $request, int $litter): RedirectResponse
+    {
+        $record = $this->ownLitter($request, $litter);
+        $name = $record->getAttribute('name');
+        $record->delete();
+
+        return redirect()->route('breeder.dashboard')->with('success', $name.' deleted, with its weights, records and handover links.');
+    }
+
+    public function destroyWaitlist(Request $request, int $entry): RedirectResponse
+    {
+        BreederWaitlist::query()->where('user_id', $request->user()->getKey())->findOrFail($entry)->delete();
+
+        return back()->with('success', 'Removed from your waiting list.');
     }
 
     public function showLitter(Request $request, int $litter): View

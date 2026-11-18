@@ -29,4 +29,11 @@
     @if($animal->exists)<label class="checkbox"><input type="checkbox" name="retired" value="1" @checked(! $animal->getAttribute('is_active'))> <span>Retired from breeding</span></label>@endif
     <div class="row"><button type="submit" class="button button--primary">Save</button></div>
 </div></form>
+
+@if($animal->exists)
+    <form method="POST" action="{{ route('breeder.animals.destroy', $animal->getKey()) }}" class="row" data-confirm="Delete {{ $animal->getAttribute('name') }}? This can't be undone.">
+        @csrf @method('DELETE')
+        <button type="submit" class="button button--ghost">Delete {{ $animal->getAttribute('name') }}</button>
+    </form>
+@endif
 @endsection
