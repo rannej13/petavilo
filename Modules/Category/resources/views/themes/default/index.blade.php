@@ -27,16 +27,7 @@
                 @if($category->getRelation('children')->isNotEmpty())
                     <div class="grid grid--categories">
                         @foreach($category->getRelation('children') as $child)
-                            <a href="{{ route('listings.index', ['category' => $child->getKey()]) }}" class="category-card">
-                                <span class="category-card__icon">
-                                    @if($child->iconUrl())
-                                        <img src="{{ $child->iconUrl() }}" alt="" loading="lazy">
-                                    @else
-                                        <x-ui.icon name="grid"/>
-                                    @endif
-                                </span>
-                                <span class="category-card__name">{{ $child->getAttribute('name') }}</span>
-                            </a>
+                            <x-ui.category-tile :category="$child"/>
                         @endforeach
                     </div>
                 @endif

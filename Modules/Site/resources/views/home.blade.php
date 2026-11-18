@@ -38,25 +38,18 @@
 
 <div class="shell shell--wide page">
     <div class="stack stack--section">
+        @include('site::partials.explore')
+
         @if($categories->isNotEmpty())
         <section class="section">
             <div class="section__head">
-                <h2 class="title-section">{{ __('site::messages.popular_categories') }}</h2>
+                <h2 class="title-section">Browse pets</h2>
                 <a href="{{ route('categories.index') }}" class="text-link">{{ __('site::messages.explore_all') }}</a>
             </div>
 
             <div class="grid grid--categories">
                 @foreach($categories->take(12) as $category)
-                    <a href="{{ route('listings.index', ['category' => $category->getKey()]) }}" class="category-card">
-                        <span class="category-card__icon">
-                            @if($category->iconUrl())
-                                <img src="{{ $category->iconUrl() }}" alt="" loading="lazy">
-                            @else
-                                <x-ui.icon name="grid"/>
-                            @endif
-                        </span>
-                        <span class="category-card__name">{{ $category->getAttribute('name') }}</span>
-                    </a>
+                    <x-ui.category-tile :category="$category"/>
                 @endforeach
             </div>
         </section>

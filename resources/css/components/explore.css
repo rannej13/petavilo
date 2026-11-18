@@ -1,0 +1,110 @@
+.explore-grid {
+    display: grid;
+    gap: var(--space-3);
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.explore-tile {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: var(--surface-raised);
+    border: 1px solid var(--line-hairline);
+    border-radius: var(--radius-md);
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.explore-tile:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+}
+
+.explore-tile__icon {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+
+.explore-tile__icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.explore-tile__body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.explore-tile__title {
+    font-weight: var(--weight-semibold, 600);
+    color: var(--ink-900, inherit);
+    line-height: var(--leading-snug);
+}
+
+.explore-tile__text {
+    font-size: var(--text-sm);
+    color: var(--ink-500);
+    line-height: var(--leading-snug);
+}
+
+.category-tile {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--surface-raised);
+    border: 1px solid var(--line-hairline);
+    border-radius: var(--radius-md);
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 0.15s ease;
+}
+
+.category-tile:hover {
+    border-color: var(--line-strong);
+}
+
+.category-tile:hover .category-tile__media img {
+    transform: scale(1.04);
+}
+
+.category-tile__media {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--surface-sunken);
+    color: var(--ink-500);
+}
+
+.category-tile__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.category-tile__media svg {
+    width: 28px;
+    height: 28px;
+}
+
+.category-tile__name {
+    padding: var(--space-3);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold, 600);
+    color: var(--ink-800);
+    text-align: center;
+    line-height: var(--leading-snug);
+}

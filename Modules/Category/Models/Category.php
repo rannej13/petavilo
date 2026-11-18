@@ -357,6 +357,69 @@ class Category extends Model
         return null;
     }
 
+    /**
+     * A photo for category tiles: an uploaded photo, else the newest real advert photo in it, else the animal's stock photo.
+     */
+    public function photoUrl(): ?string
+    {
+        $path = $this->resolvedIconPath();
+
+        if ($path !== null && preg_match('/\.(png|jpe?g|webp)$/i', $path) === 1) {
+            return asset($path);
+        }
+
+        return Cache::remember('category-photo-'.$this->getKey(), 1800, function (): ?string {
+            $ids = [(int) $this->getKey()];
+            $childIds = static::query()->where('parent_id', $this->getKey())->pluck('id')->map(fn ($id): int => (int) $id)->all();
+            $ids = array_merge($ids, $childIds);
+
+            $listing = \Modules\Listing\Models\Listing::query()
+                ->active()
+                ->whereIn('category_id', $ids)
+                ->whereHas('media', fn ($query) => $query->where('collection_name', 'listing-images'))
+                ->latest()
+                ->first();
+
+            if ($listing !== null) {
+                $url = $listing->primaryImageUrl('card');
+
+                if (is_string($url) && $url !== '') {
+                    return $url;
+                }
+            }
+
+            if (! class_exists(\Modules\CatMarket\Support\SiteImages::class)) {
+                return null;
+            }
+
+            $slug = (string) $this->getAttribute('slug');
+            $root = $this;
+            $guard = 0;
+
+            while ($root->getAttribute('parent_id') && $guard < 5) {
+                $parent = static::query()->find($root->getAttribute('parent_id'));
+
+                if (! $parent instanceof self) {
+                    break;
+                }
+
+                $root = $parent;
+                $guard++;
+            }
+
+            $rootSlug = (string) $root->getAttribute('slug');
+            $name = (string) (config('catmarket.category_images')[$rootSlug] ?? 'hero');
+
+            if ($rootSlug === 'cats' && str_contains($slug, 'rehom')) {
+                $name = 'rehoming';
+            } elseif ($rootSlug === 'cats' && str_contains($slug, 'pedigree')) {
+                $name = 'pedigree';
+            }
+
+            return \Modules\CatMarket\Support\SiteImages::url($name) ?? \Modules\CatMarket\Support\SiteImages::url('hero');
+        });
+    }
+
     public function iconUrl(): ?string
     {
         $path = $this->resolvedIconPath();
