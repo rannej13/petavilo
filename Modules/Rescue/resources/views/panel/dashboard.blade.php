@@ -30,6 +30,8 @@
             @if($organisation->acceptsDonations())
                 <p>Donations are on. People can donate from <a class="text-link" href="{{ route('rescue.show', $organisation->getAttribute('slug')) }}#donate">your rescue page</a>. Stripe sends 100% of each donation to your own Stripe account automatically and pays it out to your bank. Card fees are covered by the donor or by us, never taken from the donation.</p>
                 <p class="text-muted">{{ $donationTotals['count'] }} {{ \Illuminate\Support\Str::plural('donation', $donationTotals['count']) }} so far, {{ \Modules\Rescue\Models\Donation::money($donationTotals['sum'], $donationTotals['currency']) }} in total.</p>
+            @elseif(! config('rescue.donations_enabled'))
+                <p class="text-muted">Online donations through {{ config('catmarket.site_name') }} are coming soon. Until then, people can find your website and your own donation page from your rescue profile.</p>
             @elseif(! $organisation->getAttribute('donations_enabled'))
                 <p class="text-muted">Donations have been paused for your rescue. Contact us if you think this is a mistake.</p>
             @else

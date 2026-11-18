@@ -10,6 +10,8 @@ class MonetisationSettings extends Settings
 {
     public bool $show_example_adverts = true;
 
+    public bool $rescue_donations_enabled = false;
+
     public ?string $stripe_key;
 
     public ?string $stripe_secret;

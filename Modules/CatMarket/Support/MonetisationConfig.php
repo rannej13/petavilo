@@ -60,6 +60,7 @@ final class MonetisationConfig
 
         try {
             config(['catmarket.show_examples' => (bool) $settings->show_example_adverts]);
+            config(['rescue.donations_enabled' => (bool) $settings->rescue_donations_enabled]);
         } catch (Throwable) {
         }
 

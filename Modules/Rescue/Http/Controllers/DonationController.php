@@ -77,8 +77,8 @@ class DonationController extends Controller
 
         abort_unless($organisation->isVerified(), 403);
 
-        if (! DonationGateway::isConfigured()) {
-            return back()->with('error', 'Card payments are not switched on for the site yet.');
+        if (! config('rescue.donations_enabled') || ! DonationGateway::isConfigured()) {
+            return back()->with('error', 'Online donations are not switched on for the site yet.');
         }
 
         try {

@@ -45,6 +45,11 @@ class ManageMonetisationSettings extends SettingsPage
                 ->schema([
                     Toggle::make('show_example_adverts')->label('Show example adverts'),
                 ])->columns(1),
+            Section::make('Rescue donations')
+                ->description('Lets verified rescues take card donations on their page. Needs Stripe Connect switched on in your Stripe account (Settings > Connect), which asks for an ID check. Leave off until then.')
+                ->schema([
+                    Toggle::make('rescue_donations_enabled')->label('Allow rescue donations'),
+                ])->columns(1),
             Section::make('Sending email')
                 ->description('Lets the site send sign-up, password reset and message emails. For Resend use host smtp.resend.com, port 587, username resend and your API key as the password.')
                 ->schema([
