@@ -107,11 +107,66 @@ class BusinessResource extends Resource
                         true: fn (Builder $query): Builder => $query->whereNotNull('owner_user_id'),
                         false: fn (Builder $query): Builder => $query->whereNull('owner_user_id'),
                     ),
+                Filter::make('trial_invited')->label('Trial offered, not claimed yet')
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('pilot_offer_months')->whereNull('owner_user_id')),
                 Filter::make('on_pilot')->label('On free trial')
                     ->query(fn (Builder $query): Builder => $query->whereNotNull('pilot_tier')->where('pilot_ends_at', '>', now())),
                 Filter::make('invited')->label('Invited by email')->query(fn (Builder $query): Builder => $query->whereNotNull('invited_at')),
             ])
             ->actions([
+                Action::make('invitePilot')
+                    ->label('Email trial invite')
+                    ->icon('heroicon-o-envelope')
+                    ->color('success')
+                    ->visible(fn (Business $record): bool => ! $record->isClaimed() && filled($record->getAttribute('email')) && blank($record->getAttribute('unsubscribed_at')))
+                    ->form([
+                        \Filament\Forms\Components\Select::make('months')->options([1 => '1 month', 2 => '2 months', 3 => '3 months', 6 => '6 months'])->default(3)->required(),
+                    ])
+                    ->modalHeading(fn (Business $record): string => 'Email '.$record->getAttribute('name').' a free-trial invite')
+                    ->modalDescription(fn (Business $record): string => 'Sends one email to '.$record->getAttribute('email').' with a link to claim the listing. Claiming starts free Premium automatically. The email includes an unsubscribe link and your company details.')
+                    ->action(function (Business $record, array $data): void {
+                        $reason = \Modules\Directory\Support\OutreachPolicy::reasonToSkip($record);
+
+                        if ($reason !== null) {
+                            \Filament\Notifications\Notification::make()->title('Not sent: '.$reason)->body('UK rules on marketing emails mean we only email business addresses. Use "Get trial link" and contact them by phone or social media instead.')->warning()->persistent()->send();
+
+                            return;
+                        }
+
+                        \Modules\CatMarket\Support\MonetisationConfig::apply();
+                        $record->forceFill([
+                            'invite_token' => $record->getAttribute('invite_token') ?: \Illuminate\Support\Str::random(40),
+                            'pilot_offer_months' => (int) $data['months'],
+                        ])->saveQuietly();
+
+                        try {
+                            \Illuminate\Support\Facades\Mail::to((string) $record->getAttribute('email'))->send(new \Modules\Directory\Mail\ClaimInvitation($record, false, (int) $data['months']));
+                            $record->forceFill(['invited_at' => now(), 'invite_count' => (int) $record->getAttribute('invite_count') + 1])->saveQuietly();
+                            \Filament\Notifications\Notification::make()->title('Invite sent to '.$record->getAttribute('email'))->success()->send();
+                        } catch (\Throwable $exception) {
+                            report($exception);
+                            \Filament\Notifications\Notification::make()->title('Sending failed')->body(mb_substr($exception->getMessage(), 0, 300))->danger()->persistent()->send();
+                        }
+                    }),
+                Action::make('pilotLink')
+                    ->label('Get trial link')
+                    ->icon('heroicon-o-link')
+                    ->visible(fn (Business $record): bool => ! $record->isClaimed())
+                    ->form([
+                        \Filament\Forms\Components\Select::make('months')->options([1 => '1 month', 2 => '2 months', 3 => '3 months', 6 => '6 months'])->default(3)->required(),
+                    ])
+                    ->modalDescription('Makes a private link for you to send by phone, text, Instagram or Facebook. Whoever opens it can claim this listing, and claiming starts free Premium. Only give it to the business.')
+                    ->action(function (Business $record, array $data): void {
+                        $record->forceFill([
+                            'invite_token' => $record->getAttribute('invite_token') ?: \Illuminate\Support\Str::random(40),
+                            'pilot_offer_months' => (int) $data['months'],
+                        ])->saveQuietly();
+
+                        \Filament\Notifications\Notification::make()
+                            ->title('Trial link for '.$record->getAttribute('name'))
+                            ->body(route('directory.claim.token', $record->getAttribute('invite_token')))
+                            ->success()->persistent()->send();
+                    }),
                 Action::make('startPilot')
                     ->label('Free trial')
                     ->icon('heroicon-o-gift')

@@ -8,6 +8,9 @@
         <header class="stack stack--tight">
             <p class="text-eyebrow">{{ __('directory::messages.claim_title') }}</p>
             <h1 class="title-page">{{ $business->getAttribute('name') }}</h1>
+            @if((int) ($business->getAttribute('pilot_offer_months') ?? 0) > 0)
+                <div class="notice notice--accent"><p class="notice__title">{{ $business->getAttribute('pilot_offer_months') }} months of Premium, free</p><p>Claim this listing and Premium starts straight away: top placement in your town, photos, a new-client offer and monthly stats. No card needed and no commission, ever.</p></div>
+            @endif
             <p class="text-meta">{{ collect([$business->getAttribute('address_line'), $business->getAttribute('town'), $business->getAttribute('postcode')])->filter()->implode(', ') }}</p>
         </header>
 

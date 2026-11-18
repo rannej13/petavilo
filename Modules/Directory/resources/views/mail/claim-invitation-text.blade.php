@@ -15,9 +15,15 @@ Claiming it is free and takes two minutes. Once claimed you can:
 - get the Verified badge
 - see how many pet owners viewed your page and clicked through
 
+@if(($trialMonths ?? 0) > 0)
+We're choosing a few local businesses for a free trial: claim your listing and you get {{ $trialMonths }} months of Premium free. Top placement in your town, your photos, an offer for new clients, and a monthly count of the views, website visits and calls we send you. No card needed, no commission on your bookings, ever. After the trial it goes back to the free listing unless you choose a plan.
+
+Claim and start your free trial: {{ $claimUrl }}
+@else
 Claim it here: {{ $claimUrl }}
 
 Optional paid upgrades put you at the top of your town's results and on our homepage, but nothing is required.
+@endif
 
 Thanks,
 {{ $senderName !== '' ? $senderName.', ' : '' }}{{ $site }}

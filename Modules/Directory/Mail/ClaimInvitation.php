@@ -18,7 +18,7 @@ class ClaimInvitation extends Mailable
     use Queueable;
     use SerializesModels;
 
-    public function __construct(public Business $business, public bool $isFollowUp = false) {}
+    public function __construct(public Business $business, public bool $isFollowUp = false, public int $trialMonths = 0) {}
 
     public function envelope(): Envelope
     {
@@ -29,9 +29,11 @@ class ClaimInvitation extends Mailable
         return new Envelope(
             from: new Address($from, (string) config('directory.outreach.from_name', $site)),
             replyTo: [new Address($from, (string) config('directory.outreach.from_name', $site))],
-            subject: $this->isFollowUp
-                ? "Reminder: {$name} on {$site}"
-                : "{$name} is listed on {$site}. Claim it free",
+            subject: $this->trialMonths > 0
+                ? "{$this->trialMonths} months of free Premium for {$name} on {$site}"
+                : ($this->isFollowUp
+                    ? "Reminder: {$name} on {$site}"
+                    : "{$name} is listed on {$site}. Claim it free"),
         );
     }
 
@@ -63,6 +65,7 @@ class ClaimInvitation extends Mailable
                 'claimUrl' => route('directory.claim.token', $token),
                 'unsubscribeUrl' => route('directory.unsubscribe', $token),
                 'isFollowUp' => $this->isFollowUp,
+                'trialMonths' => $this->trialMonths,
                 'senderName' => (string) config('directory.outreach.sender_name', ''),
                 'companyLine' => collect([
                     $company['name'] ?? null,

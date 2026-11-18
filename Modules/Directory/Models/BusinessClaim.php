@@ -57,6 +57,14 @@ class BusinessClaim extends Model
 
         Business::syncTierForOwner($userId, MembershipDirectory::directoryTierFor($userId));
 
+        $offer = (int) ($business->getAttribute('pilot_offer_months') ?? 0);
+
+        if ($offer > 0) {
+            $business->refresh();
+            $business->startPilot('premium', $offer);
+            $business->forceFill(['pilot_offer_months' => null])->saveQuietly();
+        }
+
         $this->forceFill(['status' => self::APPROVED, 'decided_at' => now()])->save();
 
         static::query()
