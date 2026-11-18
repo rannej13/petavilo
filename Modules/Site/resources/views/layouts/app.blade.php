@@ -222,6 +222,10 @@
                         <a href="{{ route('rescue.found-animal') }}" class="nav-list__item"><span>Found an animal?</span><x-ui.icon name="chevron-right"/></a>
                         <a href="{{ route('rescue.rescues') }}" class="nav-list__item"><span>Rescues</span><x-ui.icon name="chevron-right"/></a>
                     @endif
+                    @if(\Illuminate\Support\Facades\Route::has('tv.index'))
+                        <a href="{{ route('tv.index') }}" class="nav-list__item"><span>Petavilo TV</span><x-ui.icon name="chevron-right"/></a>
+                        <a href="{{ route('tv.potw') }}" class="nav-list__item"><span>Pet of the Week</span><x-ui.icon name="chevron-right"/></a>
+                    @endif
                     @if(\Illuminate\Support\Facades\Route::has('pettools.index'))
                         <a href="{{ route('pettools.index') }}" class="nav-list__item"><span>Free pet tools</span><x-ui.icon name="chevron-right"/></a>
                     @endif

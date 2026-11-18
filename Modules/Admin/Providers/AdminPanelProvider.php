@@ -28,6 +28,7 @@ use Modules\Directory\DirectoryPlugin;
 use Modules\Community\CommunityPlugin;
 use Modules\Rescue\RescuePlugin;
 use Modules\PetTools\PetToolsPlugin;
+use Modules\Tv\TvPlugin;
 use Modules\Guide\GuidePlugin;
 use Modules\Demo\App\Http\Middleware\ResolveDemoRequest;
 use Modules\Listing\ListingPlugin;
@@ -99,6 +100,7 @@ class AdminPanelProvider extends PanelProvider
                 CommunityPlugin::make(),
                 RescuePlugin::make(),
                 PetToolsPlugin::make(),
+                TvPlugin::make(),
             ])
             ->pages([Dashboard::class])
             ->middleware([

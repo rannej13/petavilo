@@ -1,0 +1,11 @@
+{
+    "name": "Tv",
+    "alias": "tv",
+    "description": "Petavilo TV: curated pet shorts from YouTube and TikTok, plus moderated Pet of the Week.",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Tv\\Providers\\TvServiceProvider"
+    ],
+    "files": []
+}

@@ -13,6 +13,7 @@ import { contactReveal, shareAction } from './modules/reveal';
 import { disclosureGroup, navigationDrawer, searchSuggest, stickyHeader } from './modules/navigation';
 import { installVideoCompressor } from './modules/video-compress';
 import { renderQrCodes } from './modules/qr-code';
+import { installVideoFacades } from './modules/video-facade';
 
 const behaviors: readonly Behavior<never>[] = [
     navigationDrawer,
@@ -43,6 +44,7 @@ const behaviors: readonly Behavior<never>[] = [
 function boot(): void {
     installVideoCompressor();
     renderQrCodes();
+    installVideoFacades();
     startBehaviors(behaviors);
 }
 
