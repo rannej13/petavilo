@@ -45,6 +45,9 @@ function boot(): void {
     installVideoCompressor();
     renderQrCodes();
     installVideoFacades();
+    if (document.querySelector('[data-sightings-map]') !== null) {
+        void import('./modules/sightings-map').then((module) => module.installSightingsMaps());
+    }
     startBehaviors(behaviors);
 }
 

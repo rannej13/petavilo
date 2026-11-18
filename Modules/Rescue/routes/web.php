@@ -12,6 +12,9 @@ Route::middleware('web')->name('rescue.')->group(function (): void {
     Route::get('/rehome', [RescueController::class, 'rehome'])->name('rehome');
     Route::get('/lost-found', [RescueController::class, 'lostFound'])->name('lost-found');
     Route::get('/found-an-animal', [RescueController::class, 'foundAnimal'])->name('found-animal');
+    Route::post('/lost/{listing}/sightings', [\Modules\Rescue\Http\Controllers\SightingController::class, 'store'])->whereNumber('listing')->middleware('throttle:10,10')->name('sightings.store');
+    Route::get('/lost/{listing}/poster', [\Modules\Rescue\Http\Controllers\SightingController::class, 'poster'])->whereNumber('listing')->name('sightings.poster');
+    Route::post('/sightings/{sighting}/hide', [\Modules\Rescue\Http\Controllers\SightingController::class, 'hide'])->whereNumber('sighting')->middleware('auth')->name('sightings.hide');
     Route::get('/foster', [RescueController::class, 'foster'])->name('foster');
     Route::get('/welfare', [RescueController::class, 'welfare'])->name('welfare');
     Route::post('/welfare/{campaign}', [RescueController::class, 'answer'])->middleware('throttle:20,10')->name('welfare.answer');

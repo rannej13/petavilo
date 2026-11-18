@@ -15,6 +15,10 @@
     $isRehoming = (\Modules\CatMarket\Support\PetCatalog::leaf((string) $listing->category?->slug)['kind'] ?? null) === \Modules\CatMarket\Support\PetCatalog::KIND_REHOMING;
 @endphp
 
+@if(class_exists(\Modules\Rescue\Models\PetSighting::class) && \Modules\Rescue\Models\PetSighting::isLostListing($listing))
+    @include('rescue::partials.sightings', ['listing' => $listing])
+@endif
+
 @if($rescue && $isRehoming && ! $isOwnerViewing)
     <div class="notice notice--accent">
         <p class="notice__title">Listed by <a class="text-link" href="{{ route('rescue.show', $rescue->getAttribute('slug')) }}">{{ $rescue->getAttribute('name') }}</a>, a verified rescue</p>
