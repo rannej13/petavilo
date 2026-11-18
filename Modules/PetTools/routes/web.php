@@ -16,6 +16,8 @@ Route::middleware('web')->name('pettools.')->group(function (): void {
     Route::get('/tools/pet-insurance-or-savings', [ToolsController::class, 'insurance'])->name('insurance');
     Route::get('/tools/dental-and-senior-check', [ToolsController::class, 'dental'])->name('dental');
     Route::post('/tools/vet-check-request', [ToolsController::class, 'storeLead'])->middleware('throttle:5,10')->name('lead');
+    Route::get('/tools/is-this-pet-right-for-me', [ToolsController::class, 'match'])->name('match');
+    Route::post('/tools/is-this-pet-right-for-me', [ToolsController::class, 'saveMatch'])->middleware(['auth', 'throttle:10,1'])->name('match.save');
     Route::get('/tools/cat-pain-check', [ToolsController::class, 'painCheck'])->name('pain');
     Route::get('/tools/pet-passport', [ToolsController::class, 'passportAbout'])->name('passport.about');
     Route::get('/for-vets', [ClinicTriageController::class, 'forVets'])->name('clinic.landing');

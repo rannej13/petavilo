@@ -21,7 +21,7 @@
                     <select id="answer-{{ $key }}" name="answers[{{ $key }}]" class="select" required>
                         <option value="">Choose</option>
                         @foreach($question['options'] as $option)
-                            <option value="{{ $option }}" @selected(old('answers.'.$key) === $option)>{{ $option }}</option>
+                            <option value="{{ $option }}" @selected(old('answers.'.$key, $saved[$key] ?? null) === $option)>{{ $option }}</option>
                         @endforeach
                     </select>
                     @error('answers.'.$key)<p class="field__error">{{ $message }}</p>@enderror

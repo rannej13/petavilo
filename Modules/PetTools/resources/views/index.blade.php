@@ -14,6 +14,11 @@
         </header>
 
         <div class="grid grid--three">
+            <a href="{{ route('pettools.match') }}" class="card"><div class="card__body stack stack--tight">
+                <p class="text-eyebrow">Thinking of getting a pet?</p>
+                <h2 class="title-card">Is this pet right for me?</h2>
+                <p class="text-muted">11 quick questions, honest reasons and real monthly costs.</p>
+            </div></a>
             <a href="{{ route('pettools.poison') }}" class="card"><div class="card__body stack stack--tight">
                 <p class="text-eyebrow">Is it poisonous?</p>
                 <h2 class="title-card">Check food, plants, medicines and household products</h2>

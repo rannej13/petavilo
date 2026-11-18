@@ -29,6 +29,7 @@ class PetToolsServiceProvider extends ServiceProvider
         SitemapRegistry::register(static fn (): array => [
             ['url' => route('pettools.index')],
             ['url' => route('pettools.poison')],
+            ['url' => route('pettools.match')],
             ['url' => route('pettools.food')],
             ['url' => route('pettools.passport.about')],
         ]);

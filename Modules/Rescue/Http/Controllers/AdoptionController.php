@@ -25,6 +25,9 @@ class AdoptionController extends Controller
             'listing' => $record,
             'organisation' => $organisation,
             'questions' => AdoptionApplication::questions(),
+            'saved' => class_exists(\Modules\PetTools\Models\PetMatchResult::class)
+                ? \Modules\PetTools\Models\PetMatchResult::answersFor(auth()->id() === null ? null : (int) auth()->id())
+                : [],
         ]);
     }
 

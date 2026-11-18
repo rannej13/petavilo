@@ -236,4 +236,54 @@ class ToolsController extends Controller
     {
         return class_exists(CatMarketSettings::class) ? CatMarketSettings::visitorCountry() : 'GB';
     }
+
+    public function match(Request $request): View
+    {
+        $questions = \Modules\PetTools\Support\PetMatch::questions();
+        $answers = [];
+
+        foreach ($questions as $key => $question) {
+            $value = (string) $request->query($key, '');
+
+            if (in_array($value, $question['options'], true)) {
+                $answers[$key] = $value;
+            }
+        }
+
+        if ($answers === [] && $request->user() !== null && ! $request->has('new')) {
+            $answers = \Modules\PetTools\Models\PetMatchResult::answersFor((int) $request->user()->getKey());
+        }
+
+        $complete = count($answers) === count($questions);
+
+        return view('pettools::match', [
+            'questions' => $questions,
+            'answers' => $answers,
+            'complete' => $complete,
+            'results' => $complete ? \Modules\PetTools\Support\PetMatch::assess($answers) : [],
+            'checks' => $complete ? \Modules\PetTools\Support\PetMatch::checks($answers) : [],
+            'sources' => \Modules\PetTools\Support\PetMatch::sources(),
+            'saved' => $request->user() !== null && \Modules\PetTools\Models\PetMatchResult::query()->where('user_id', $request->user()->getKey())->exists(),
+        ]);
+    }
+
+    public function saveMatch(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $questions = \Modules\PetTools\Support\PetMatch::questions();
+        $rules = [];
+
+        foreach ($questions as $key => $question) {
+            $rules[$key] = ['required', \Illuminate\Validation\Rule::in($question['options'])];
+        }
+
+        $answers = $request->validate($rules);
+        $top = \Modules\PetTools\Support\PetMatch::assess($answers)[0]['key'] ?? null;
+
+        \Modules\PetTools\Models\PetMatchResult::query()->updateOrCreate(
+            ['user_id' => $request->user()->getKey()],
+            ['answers' => $answers, 'top_pet' => $top],
+        );
+
+        return redirect()->route('pettools.match', $answers)->with('success', 'Saved. Your answers will fill in rescue application forms for you.');
+    }
 }
