@@ -226,6 +226,9 @@
                         <a href="{{ route('tv.index') }}" class="nav-list__item"><span>Petavilo TV</span><x-ui.icon name="chevron-right"/></a>
                         <a href="{{ route('tv.potw') }}" class="nav-list__item"><span>Pet of the Week</span><x-ui.icon name="chevron-right"/></a>
                     @endif
+                    @if(\Illuminate\Support\Facades\Route::has('breeder.landing'))
+                        <a href="{{ route('breeder.landing') }}" class="nav-list__item"><span>For breeders</span><x-ui.icon name="chevron-right"/></a>
+                    @endif
                     @if(\Illuminate\Support\Facades\Route::has('pettools.index'))
                         <a href="{{ route('pettools.index') }}" class="nav-list__item"><span>Free pet tools</span><x-ui.icon name="chevron-right"/></a>
                     @endif

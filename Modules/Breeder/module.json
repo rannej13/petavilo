@@ -1,0 +1,11 @@
+{
+    "name": "Breeder",
+    "alias": "breeder",
+    "description": "Free breeder tools for every species: dams and sires, litters, growth and health records, waiting list, licence register and Pet Passport handover.",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Breeder\\Providers\\BreederServiceProvider"
+    ],
+    "files": []
+}

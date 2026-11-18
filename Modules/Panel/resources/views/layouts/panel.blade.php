@@ -13,6 +13,7 @@
         ['key' => 'videos', 'label' => __('panel::messages.videos'), 'icon' => 'video', 'url' => route('panel.videos.index'), 'count' => null],
         ['key' => 'membership', 'label' => __('billing::messages.membership'), 'icon' => 'star', 'url' => route('billing.membership.index'), 'count' => null],
         ['key' => 'business', 'label' => __('directory::messages.my_business'), 'icon' => 'building', 'url' => route('directory.panel.index'), 'count' => null],
+        ['key' => 'breeder', 'label' => 'Breeder tools', 'icon' => 'tag', 'url' => route('breeder.dashboard'), 'count' => null],
         ['key' => 'pets', 'label' => 'My pets', 'icon' => 'heart', 'url' => route('pettools.passport.index'), 'count' => null],
         ['key' => 'adoptions', 'label' => 'Adoptions', 'icon' => 'heart', 'url' => route('rescue.panel.mine'), 'count' => null],
         ['key' => 'clinic', 'label' => 'Clinic widget', 'icon' => 'building', 'url' => route('pettools.clinic.dashboard'), 'count' => null],
